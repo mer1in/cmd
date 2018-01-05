@@ -4,12 +4,12 @@ cmd line tools
 v
 -
 open file my-file @line 122
-> v `$ my-file:122:`
+> `v my-file:122:`
 
 gred 
 ----
 grep and edit
-> `$ gred sed`
+> `gred sed`
 
 ```
 1:./gred:25:    tee >(cat|sed '='|sed 'N;s/\n/:/'|tee >((cat|sed 's/$/\n/') 1>&5) 1>&4)|\
@@ -27,7 +27,7 @@ svd
 ---
 simplify svn diff:
 ```
-svd [-c|-l|-a|-r]
+svd [-c|-l|-a|-r|<filename>]
 no params - list of changed files
 -l - list of changed files with status
 -c - colordiff all changes
