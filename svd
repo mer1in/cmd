@@ -1,0 +1,19 @@
+#!/bin/bash
+
+[ -z "$1" ] && { $0 -l|sed "s/^[ARM]\s*//" ; exit ; }
+[ $1 = '-c' ] && { shift ; svn diff $@ |colordiff ; exit ; }
+[ $1 = '-l' ] && { svn diff --summarize ; exit ; }
+[ -n "$6" ] && [ -n "$7" ] && [ -f $6 ] && [ -f $7 ] && { vim -d $7 $6 ; exit ; }
+[ -f $1 ] && { svn diff -x -w --diff-cmd $0 $1 ; exit ; }
+[ $1 = '-a' ] && { for a in `$0` ; do echo $a ; sleep 1 ; $0 $a ; done ; exit ; }
+[ $1 = '-r' ] && { echo "Going to revert ALL changes!" ; read I ; for a in `$0` ; do svn revert $a ; done ; exit ; }
+cat << ENDL
+$0 simplify svn diff:
+$0 [-c|-l|-a|-r]
+no params - list of changed files
+-l - list of changed files with status
+-c - colordiff all changes
+<filename> - vimdiff changed file
+-a - vimdiff all changed files
+-r - revert all changes
+ENDL
