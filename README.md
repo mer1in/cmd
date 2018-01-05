@@ -4,7 +4,7 @@ cmd line tools
 v
 -
 open file my-file @line 122
-> `$ my-file:122:`
+> v `$ my-file:122:`
 
 gred 
 ----
