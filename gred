@@ -1,13 +1,13 @@
 #!/bin/bash
 # grep and edit
 JS_EXCLUDE='--exclude-dir build --exclude-dir node_modules'
-while [ $1 ]; do
-    [ $1 = '-x' ] && { shift ; X="$X --exclude-dir $1 " ; shift ; continue ; }
-    [ $1 = '-cpp' ] && { shift ; I="$I `echo --include=\*.{cpp,h,c,hpp}`" ; continue ; }
-    [ $1 = '-js' ] && { shift ; I="$I `echo --include=\*.{js,jsx}`" X="$X $JS_EXCLUDE" ; continue ; }
-    [ $1 = '-json' ] && { shift ; I="$I `echo --include=\*.{json}`" X="$X $JS_EXCLUDE" ; continue ; }
-    [ $1 = '-css' ] && { shift ; I="$I `echo --include=\*.{css}`" ; continue ; }
-    [ -n "$EXPR" ] && EXPR="$EXPR $1" || EXPR=$1
+while [ -n "$1" ]; do
+    [ "$1" = '-x' ] && { shift ; X="$X --exclude-dir $1 " ; shift ; continue ; }
+    [ "$1" = '-cpp' ] && { shift ; I="$I `echo --include=\*.{cpp,h,c,hpp}`" ; continue ; }
+    [ "$1" = '-js' ] && { shift ; I="$I `echo --include=\*.{js,jsx}`" X="$X $JS_EXCLUDE" ; continue ; }
+    [ "$1" = '-json' ] && { shift ; I="$I `echo --include=\*.{json}`" X="$X $JS_EXCLUDE" ; continue ; }
+    [ "$1" = '-css' ] && { shift ; I="$I `echo --include=\*.{css}`" ; continue ; }
+    [ -n "$EXPR" ] && EXPR="$EXPR $1" || EXPR="$1"
     shift
 done
 
@@ -21,7 +21,7 @@ trap cleanup EXIT SIGINT
 
 exec 4>&1
 exec 5>$BUF_FILE
-LIST="`grep --color=always --exclude-dir \.svn --exclude-dir \.git $X $I -Inr $EXPR .|\
+LIST="`grep --color=always --exclude-dir \.svn --exclude-dir \.git $X $I -Inr "$EXPR" .|\
     tee >(cat|sed '='|sed 'N;s/\n/:/'|tee >((cat|sed 's/$/\n/') 1>&5) 1>&4)|\
     (sed -e 's,\x1B\[[0-9;]*[a-zA-Z],,g' -e 's,:.*,,'|sort -u)`" 
 COUNT=$(echo $LIST|wc -w)

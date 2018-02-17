@@ -9,7 +9,7 @@ open file my-file @line 122
 gred 
 ----
 grep and edit
-> `gred sed`
+> `gred 'sed .*A'`
 
 ```
 1:./gred:25:    tee >(cat|sed '='|sed 'N;s/\n/:/'|tee >((cat|sed 's/$/\n/') 1>&5) 1>&4)|\
