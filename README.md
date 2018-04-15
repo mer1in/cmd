@@ -39,3 +39,10 @@ no params - list of changed files
 install.sh
 ----------
 update && cp into `/usr/local/bin/`
+
+todo
+----
+add gred keys:
+--name '*.ext':  search only ext files
+--no-exclude|-nox: do not exclude any files
+--help
