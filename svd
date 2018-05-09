@@ -1,6 +1,5 @@
 #!/bin/bash
-
-[ -z "$1" ] && { $0 -l|sed "s/^[ARM]\s*//" ; exit ; }
+[ -z "$1" ] && { $0 -l|sed "s/^[ARMD]\s*//" ; exit ; }
 [ $1 = '-c' ] && { shift ; svn diff $@ |colordiff ; exit ; }
 [ $1 = '-l' ] && { svn diff --summarize ; exit ; }
 [ -n "$6" ] && [ -n "$7" ] && [ -f $6 ] && [ -f $7 ] && { vim -d $7 $6 ; exit ; }
