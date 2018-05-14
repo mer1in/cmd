@@ -20,7 +20,7 @@ set nofoldenable
 map <Tab> ]c
 map <S-Tab> [c
 
-map <F4> :call NextExt<CR>
+map <F4> :call NextExt()<CR>
 map <C-N> :NERDTreeToggle<CR>
 
 set runtimepath^=~/.vim/bundle/ctrlp.vim
