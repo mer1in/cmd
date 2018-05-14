@@ -5,10 +5,10 @@ COLOR='--color=always'
 while [ -n "$1" ]; do
     [ "$1" = '-x' ] && { shift ; X="$X --exclude-dir $1 " ; shift ; continue ; }
     [ "$1" = '-cpp' ] && { shift ; I="$I `echo --include=\*.{cpp,h,c,hpp,inl}`" ; continue ; }
-    [ "$1" = '-txt' ] && { shift ; I="$I --include=*.txt" ; continue ; }
+    [ "$1" = '-cmake' ] && { shift ; I="$I `echo --include=\*.{txt,cmake}`" ; continue ; }
     [ "$1" = '-js' ] && { shift ; I="$I `echo --include=\*.{js,jsx}`" X="$X $JS_EXCLUDE" ; continue ; }
-    [ "$1" = '-json' ] && { shift ; I="$I `echo --include=\*.{json}`" X="$X $JS_EXCLUDE" ; continue ; }
-    [ "$1" = '-css' ] && { shift ; I="$I `echo --include=\*.{css}`" ; continue ; }
+    [ "$1" = '-json' ] && { shift ; I="$I --include=*.{json}" X="$X $JS_EXCLUDE" ; continue ; }
+    [ "$1" = '-css' ] && { shift ; I="$I --include=*.{css}" ; continue ; }
     [ "$1" = '--ni' ] && { NONINTERACTIVE=1; shift ; continue ; }
     [ "$1" = '--nc' ] && { COLOR='' ; shift ; continue ; }
     [ "$1" = '--verbose' ] && { VERBOSE=1 ; shift ; continue ; }
@@ -35,6 +35,7 @@ LIST="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -Inr "$EXPR" .|
 COUNT=$(echo $LIST|wc -w)
 echo "$COUNT files found"
 (( $COUNT )) || exit
+# TODO: choose more than one entry
 read I
 [ -z "$I" ] && { vim $LIST -O$(($COUNT<3?$COUNT:3)) +/"$EXPR" ; exit ; }
 while read line ; do
