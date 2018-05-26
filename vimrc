@@ -24,20 +24,54 @@ map <C-N> :NERDTreeToggle<CR>
 
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 
-set grepprg=gred\ --x\ build\ --cpp\ --ni\ --nc
+let g:grep_mode='auto'
+let g:ext_groups = {'cpp':['c','h','cpp','hpp','inl'], 'cmake':['cmake','txt']}
+
 map // "sy/<C-R>s<CR>
-map gw "syiw/<C-R>s<CR>?<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
+map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
 map gt <C-P><C-\>w
-map gs "sy/<C-R>s<CR>?<CR>:grep! "<C-R>s"<CR>:cw<CR>
+map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
+map gg :call NextGrepMode()<CR>
+
+"XXX: clean it
+function! NextGrepMode()
+    let gk = keys(g:ext_groups)
+    call add(gk, 'auto')
+    let gk += gk
+    for k in gk
+        if k==g:grep_mode
+            let g:grep_mode=gk[index(gk,k)+1]
+            echo g:grep_mode
+            return
+        endif
+    endfor
+endfunction
+
+function! SetGrep()
+    if g:grep_mode!='auto'
+        execute('set grepprg=gred\ --ni\ --nc\ --'.g:grep_mode)
+        return
+    endif
+    let ext = expand('%:e')
+    let gk = keys(g:ext_groups)
+    for k in gk
+        let g=g:ext_groups[k]
+        for e in g
+            if e==ext
+                execute('set grepprg=gred\ --ni\ --nc\ --'.k)
+                return
+            endif
+        endfor
+    endfor
+    execute('set grepprg=gred\ --ni\ --nc')
+endfunction
 
 function! NextExt()
-    "XXX: import group from g:, use default if not set
-    let groups = {'c++':['c','h','cpp','hpp','inl'], 'cmake':['cmake','txt']}
     let ext = expand('%:e')
     let name = expand('%:r')
-    let gk = keys(groups)
+    let gk = keys(g:ext_groups)
     for k in gk
-        let g=groups[k]
+        let g=g:ext_groups[k]
         for e in g
             if e==ext
                 let sg = g[index(g,e)+1:]+g
