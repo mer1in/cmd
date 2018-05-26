@@ -13,7 +13,6 @@ set sw=4
 set et
 set number
 set hlsearch
-colo blue
 set foldmethod=syntax
 set nofoldenable
 
@@ -25,11 +24,11 @@ map <C-N> :NERDTreeToggle<CR>
 
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 
-set grepprg=gred\ -x\ Build\ -x\ ExternalLibs\ -x\ BcCaffe\ -cpp\ --ni\ --nc
+set grepprg=gred\ --x\ build\ --cpp\ --ni\ --nc
 map // "sy/<C-R>s<CR>
-nnoremap gw :grep! '\<<cword>\>'<CR>:cw<CR>
+map gw "syiw/<C-R>s<CR>?<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
 map gt <C-P><C-\>w
-map /g "sy:grep! "<C-R>s"<CR>:cw<CR>
+map gs "sy/<C-R>s<CR>?<CR>:grep! "<C-R>s"<CR>:cw<CR>
 
 function! NextExt()
     "XXX: import group from g:, use default if not set

@@ -1,6 +1,8 @@
 cmd line tools
 ==============
 
+git clone https://github.com/mer1in/v && cd v && (sudo ./install.sh) && ./install sh
+
 v
 -
 open file my-file @line 122
@@ -42,7 +44,12 @@ update && cp into `/usr/local/bin/`
 
 todo
 ----
-add gred keys:
-- --name '*.ext':  search only ext files
-- --no-exclude|-nox: do not exclude any files
-- --help
+gred
+- add keys:
+    - --name '*.ext':  search only ext files
+    - --no-exclude|-nox: do not exclude any files
+- choose multiple files to open
+
+svd
+- support git
+- revert files by name
