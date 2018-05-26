@@ -3,7 +3,7 @@ cmd line tools
 
 ctrl+c ctrl+v
 -------------
-git clone https://github.com/mer1in/v && cd v && (sudo ./install.sh) && ./install.sh
+> `git clone https://github.com/mer1in/v && cd v && (sudo ./install.sh) && ./install.sh`
 
 v
 -
