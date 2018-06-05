@@ -13,6 +13,7 @@ JS_EXCLUDE='--exclude-dir node_modules'
 COLOR='--color=always'
 while [ -n "$1" ]; do
     [ "$1" = '--help' ] && { help ; exit 1 ; }  #descr# Show help and exit
+    [ "$1" = '--path' ] && { shift ; P="$P $1 " ; shift ; continue ; } #descr# Search path dirs
     [ "$1" = '--x' ] && { shift ; X="$X --exclude-dir $1 " ; shift ; continue ; } #descr# Exclude dir
     [ "$1" = '--cpp' ] && { shift ; I="$I `echo --include=\*.{cpp,h,c,hpp,inl}`" ; continue ; } #descr# Limit search to c++ files
     [ "$1" = '--cmake' ] && { shift ; I="$I `echo --include=\*.{txt,cmake}`" ; continue ; } #descr# Limit search to cmake files
@@ -26,6 +27,7 @@ while [ -n "$1" ]; do
     [ -n "$EXPR" ] && EXPR="$EXPR $1" || EXPR="$1"
     shift
 done
+[ -z "$P" ] && P="."
 
 # Unnamed pipe has limited size, so have to use tmp file instead
 BUF_FILE=/tmp/$$
@@ -37,11 +39,11 @@ trap cleanup EXIT SIGINT
 
 exec 4>&1
 exec 5>$BUF_FILE
-[ -n "$VERBOSE" ] && echo "grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr \"$EXPR\""
-[ -n "$NONINTERACTIVE" ] && { grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" . ;\
+[ -n "$VERBOSE" ] && echo "grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr \"$EXPR\" $P"
+[ -n "$NONINTERACTIVE" ] && { grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" $P ;\
     exit ; }
-LIST="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -Inr "$EXPR" .|\
-    tee >(cat|sed '='|sed 'N;s/\n/:/'|tee >((cat|sed 's/$/\n/') 1>&5) 1>&4)|\
+LIST="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -Inr "$EXPR" $P|\
+    tee >(cat|sed '='|sed 'N;s/\n/:/'|tee >((cat|sed 's/$/\n/') 1>&5) 1>&4)|
     (sed -e 's,\x1B\[[0-9;]*[a-zA-Z],,g' -e 's,:.*,,'|sort -u)`" 
 COUNT=$(echo $LIST|wc -w)
 echo "$COUNT files found"
