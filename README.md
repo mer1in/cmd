@@ -54,4 +54,6 @@ gred
 
 svd
 - support git
-- revert files by name
+
+vimrc
+- buffexplorer @darwin
