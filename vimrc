@@ -32,7 +32,7 @@ map // "sy/<C-R>s<CR>
 map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
 map gt <C-P><C-\>w
 map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
-map gg :call NextGrepMode()<CR>
+map gm :call NextGrepMode()<CR>
 
 "XXX: clean it
 function! NextGrepMode()
