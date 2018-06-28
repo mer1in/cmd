@@ -22,7 +22,7 @@ while [ -n "$1" ]; do
     [ "$1" = '--css' ] && { shift ; I="$I --include=*.{css}" ; continue ; } #descr# Limit search to .css files
     [ "$1" = '--ni' ] && { NONINTERACTIVE=1; shift ; continue ; } #descr# Non interactive mode
     [ "$1" = '--nc' ] && { COLOR='' ; shift ; continue ; } #descr# No color
-    [ "$1" = '--ci' ] && { CI=i ; shift ; continue ; } #descr# Case insencitive
+    [ "$1" = '--ci' ] && { CI=i ; SCI='\c'; shift ; continue ; } #descr# Case insencitive
     [ "$1" = '--verbose' ] && { VERBOSE=1 ; shift ; continue ; } #descr# Show how grep is invoked
     [ -n "$EXPR" ] && EXPR="$EXPR $1" || EXPR="$1"
     shift
@@ -42,7 +42,7 @@ exec 5>$BUF_FILE
 [ -n "$VERBOSE" ] && echo "grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr \"$EXPR\" $P"
 [ -n "$NONINTERACTIVE" ] && { grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" $P ;\
     exit ; }
-LIST="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -Inr "$EXPR" $P|\
+LIST="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" $P|\
     tee >(cat|sed '='|sed 'N;s/\n/:/'|tee >((cat|sed 's/$/\n/') 1>&5) 1>&4)|
     (sed -e 's,\x1B\[[0-9;]*[a-zA-Z],,g' -e 's,:.*,,'|sort -u)`" 
 COUNT=$(echo $LIST|wc -w)
@@ -50,7 +50,7 @@ echo "$COUNT files found"
 (( $COUNT )) || exit
 # TODO: choose more than one entry
 read I
-[ -z "$I" ] && { vim $LIST -O$(($COUNT<3?$COUNT:3)) +/"$EXPR" ; exit ; }
+[ -z "$I" ] && { vim $LIST -O$(($COUNT<3?$COUNT:3)) +/"${SCI}${EXPR}" ; exit ; }
 while read line ; do
     [ $I = "`echo $line|sed 's/:.*//'`" ] &&\
         STRIPPED=`echo $line|sed -EXTENDED_REGEXP_KEY "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"` &&\
@@ -58,5 +58,5 @@ while read line ; do
         EF=`echo $STRIPPED|sed -e 's/^[^:]*://;s/:.*//'` &&\
         break
 done <$BUF_FILE
-[ -n "$EF" ] && [ -n "$LINE_NUM" ] && vim $EF +/"$EXPR" -c $LINE_NUM && exit
+[ -n "$EF" ] && [ -n "$LINE_NUM" ] && vim $EF +/"${SCI}${EXPR}" -c $LINE_NUM && exit
 echo "no entry #'$I'"
