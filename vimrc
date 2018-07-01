@@ -26,7 +26,7 @@ map <C-N> :NERDTreeToggle<CR>
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 
 let g:grep_mode='auto'
-let g:ext_groups = {'cpp':['c','h','cpp','hpp','inl'], 'cmake':['cmake','txt']}
+let g:ext_groups = {'cpp':['c','h','cpp','hpp','inl','cu'], 'cmake':['cmake','txt']}
 
 map // "sy/<C-R>s<CR>
 map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>

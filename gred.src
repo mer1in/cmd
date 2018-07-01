@@ -15,7 +15,7 @@ while [ -n "$1" ]; do
     [ "$1" = '--help' ] && { help ; exit 1 ; }  #descr# Show help and exit
     [ "$1" = '--path' ] && { shift ; P="$P $1 " ; shift ; continue ; } #descr# Search path dirs
     [ "$1" = '--x' ] && { shift ; X="$X --exclude-dir $1 " ; shift ; continue ; } #descr# Exclude dir
-    [ "$1" = '--cpp' ] && { shift ; I="$I `echo --include=\*.{cpp,h,c,hpp,inl}`" ; continue ; } #descr# Limit search to c++ files
+    [ "$1" = '--cpp' ] && { shift ; I="$I `echo --include=\*.{cpp,h,c,hpp,inl,cu}`" ; continue ; } #descr# Limit search to c++ files
     [ "$1" = '--cmake' ] && { shift ; I="$I `echo --include=\*.{txt,cmake}`" ; continue ; } #descr# Limit search to cmake files
     [ "$1" = '--js' ] && { shift ; I="$I `echo --include=\*.{js,jsx}`" X="$X $JS_EXCLUDE" ; continue ; } #descr# Limit search to javascript files
     [ "$1" = '--json' ] && { shift ; I="$I --include=*.{json}" X="$X $JS_EXCLUDE" ; continue ; } #descr# Limit search to .json files
