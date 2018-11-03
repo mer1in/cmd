@@ -96,6 +96,8 @@ map <Leader>n :call Background()<CR>
 nmap <Leader>h :brow old<CR>
 
 set laststatus=2
+set background=dark
+
 let s:sel = 0
 let g:run_cmd = ''
 let g:build_modes = ['Release','Release_Internal','Debug']
@@ -131,22 +133,22 @@ function! Compile(conf, build, run, ...)
     let hint = m . ' : '
     if a:conf
         let cmd .= '(t=`date`; '
-        let cmd .= '(cd $BDIR; cmake -DCMAKE_BUILD_TYPE='.m.' ../../) 2>&1|tee logs/conf.'.m
-        let cmd .= ' ;(echo "'.s.'"; echo "Started  @$t"; echo "Finished @`date`") >>logs/conf.'.m.')'
+        let r = '(cd $BDIR; cmake -DCMAKE_BUILD_TYPE='.m.' ../../ ; echo "exit with $?") 2>&1|tee logs/conf.'.m
+        let cmd .= r.' ;(echo "'.s.'"; echo "'.r.'"; echo "Started  @$t"; echo "Finished @`date`") >>logs/conf.'.m.')'
         let hint .= ' conf '
         let c = ' && '
     endif
     if a:build
         let cmd .= c.'(t=`date`; '
-        let cmd .= '(cd $BDIR; cmake --build . -- -j20) 2>&1|tee logs/build.'.m
-        let cmd .= ' ;(echo "'.s.'"; echo "Started  @$t"; echo "Finished @`date`") >>logs/build.'.m.')'
+        let r = '(cd $BDIR; cmake --build . -- -j20; echo "exit with $?") 2>&1|tee logs/build.'.m
+        let cmd .= r.' ;(echo "'.s.'"; echo "'.r.'"; echo "Started  @$t"; echo "Finished @`date`") >>logs/build.'.m.')'
         let hint .= ' build '
         let c = ' && '
     endif
     if a:run
         let cmd .= c.'(t=`date`; '
-        let cmd .= MkRunCmd(g:run_cmd).' 2>&1|tee logs/run.'.m
-        let cmd .= ' ; (echo "'.s.'"; echo "Started  @$t"; echo "Finished @`date`") >>logs/run.'.m.')'
+        let r = '('.MkRunCmd(g:run_cmd).' 2>&1 ; echo "exit with $?")|tee logs/run.'.m.
+        let cmd .= r.' ; (echo "'.s.'"; echo '''.r.'''; echo "Started  @$t"; echo "Finished @`date`") >>logs/run.'.m.')'
         let hint .= ' run '
     endif
     echo hint . ' (' . a:conf . a:build . a:run . ')'
@@ -171,7 +173,6 @@ function! ShowMenu()
     let s:run_cmd = g:run_cmd
     let done = 0
     while !done
-        echo "while"
         let done = !ShowConf(1)
     endwhile
 endfunction
@@ -247,7 +248,7 @@ endfunction
 
 map cm :call NextBuildMode()<CR>
 map cc :call Compile(1,0,0)<CR>
-map ccb  :call Compile(1,1,0)<CR>/\c\<error\><CR>
+map ccb :call Compile(1,1,0)<CR>/\c\<error\><CR>
 map ccbr :call Compile(1,1,1)<CR>
 map cb :call Compile(0,1,0)<CR>/\c\<error\><CR>
 map cbr :call Compile(0,1,1)<CR>
