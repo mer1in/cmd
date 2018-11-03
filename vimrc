@@ -42,6 +42,7 @@ map gm :call NextGrepMode()<CR>
 function! NextGrepMode()
     let gk = keys(g:ext_groups)
     call add(gk, 'auto')
+    call add(gk, 'none')
     let gk += gk
     for k in gk
         if k==g:grep_mode
@@ -53,6 +54,10 @@ function! NextGrepMode()
 endfunction
 
 function! SetGrep()
+    if g:grep_mode=='none'
+        execute('set grepprg=gred\ --ni\ --nc')
+        return
+    endif
     if g:grep_mode!='auto'
         execute('set grepprg=gred\ --ni\ --nc\ --'.g:grep_mode)
         return
