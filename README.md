@@ -49,7 +49,6 @@ todo
 gred
 - add keys:
     - --name '*.ext':  search only ext files
-    - --no-exclude|-nox: do not exclude any files
 - choose multiple files to open
 
 svd
