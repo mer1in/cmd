@@ -54,12 +54,13 @@ function! NextGrepMode()
 endfunction
 
 function! SetGrep()
+    let gred_exec = $HOME.'gred\ --ni\ --nc'
     if g:grep_mode=='none'
-        execute('set grepprg=gred\ --ni\ --nc')
+        execute('set grepprg='.gred_exec)
         return
     endif
     if g:grep_mode!='auto'
-        execute('set grepprg=gred\ --ni\ --nc\ --'.g:grep_mode)
+        execute('set grepprg='.gred_exec.'\ --'.g:grep_mode)
         return
     endif
     let ext = expand('%:e')
@@ -68,12 +69,12 @@ function! SetGrep()
         let g=g:ext_groups[k]
         for e in g
             if e==ext
-                execute('set grepprg=gred\ --ni\ --nc\ --'.k)
+                execute('set grepprg='.gred_exec.'\ --'.k)
                 return
             endif
         endfor
     endfor
-    execute('set grepprg=gred\ --ni\ --nc')
+    execute('set grepprg='.gred_exec.)
 endfunction
 
 function! NextExt()
