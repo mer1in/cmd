@@ -3,7 +3,7 @@ SWD=`pwd`
 CWD=`pwd`
 while [ $CWD != '/' ]
 do
-    [ -d .git ] && echo $CWD && exit
+    [[ -d .git || -d .svn ]] && echo $CWD && exit
     cd ..
     CWD=`pwd`
 done

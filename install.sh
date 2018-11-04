@@ -16,7 +16,7 @@ cat vimrc|grep -v $VRC_EXCLUDE > $VIMRC
 [ -f ~/.bashrc ] && sed -i '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
 cat <<EOM >>~/.bashrc
 #_V_UTILS_BEGIN_
-alias cdr='cd $(~/.v.utils/cdr)'
+alias cdr='cd \$(~/.v.utils/cdr)'
 alias gred='~/.v.utils/gred'
 alias svd='~/.v.utils/svd'
 alias v='~/.v.utils/v'
