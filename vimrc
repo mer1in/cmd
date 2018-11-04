@@ -74,7 +74,7 @@ function! SetGrep()
             endif
         endfor
     endfor
-    execute('set grepprg='.gred_exec.)
+    execute('set grepprg='.gred_exec)
 endfunction
 
 function! NextExt()
