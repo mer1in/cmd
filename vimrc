@@ -153,7 +153,7 @@ function! Compile(conf, build, run, ...)
     endif
     if a:run
         let cmd .= c.'(t=`date`; '
-        let r = '('.MkRunCmd(g:run_cmd).' 2>&1 ; echo "exit with $?")|tee logs/run.'.m.
+        let r = '('.MkRunCmd(g:run_cmd).' 2>&1 ; echo "exit with $?")|tee logs/run.'.m
         let cmd .= r.' ; (echo "'.s.'"; echo '''.r.'''; echo "Started  @$t"; echo "Finished @`date`") >>logs/run.'.m.')'
         let hint .= ' run '
     endif
