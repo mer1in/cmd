@@ -56,7 +56,7 @@ endfunction
 function! SetGrep()
     let gred_exec = $HOME.'/.v.utils/gred\ --ni\ --nc'
     if g:grep_mode=='none'
-        execute('set grepprg='.gred_exec)
+        execute('set grepprg='.gred_exec.'\ --nox')
         return
     endif
     if g:grep_mode!='auto'
