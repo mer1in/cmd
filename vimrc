@@ -98,7 +98,7 @@ function! NextExt()
 endfunction
 
 map <F5> :execute('ConqueGdb --args '.MkRunCmd(g:run_cmd))<CR>b *main<CR>run<CR>
-map <Leader>n :call Background()<CR>
+map <Leader>k :call Background()<CR>
 nmap <Leader>h :brow old<CR>
 
 set laststatus=2
