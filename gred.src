@@ -24,6 +24,7 @@ while [ -n "$1" ]; do
     [ "$1" = '--nc' ] && { COLOR='' ; shift ; continue ; } #descr# No color
     [ "$1" = '--ci' ] && { CI=i ; SCI='\c'; shift ; continue ; } #descr# Case insencitive
     [ "$1" = '--verbose' ] && { VERBOSE=1 ; shift ; continue ; } #descr# Show how grep is invoked
+    [ "$1" = '--nox' ] && { shift ; X="" ; continue ; } #decsr No default exclude (just .svn and .git remain)
     [ -n "$EXPR" ] && EXPR="$EXPR $1" || EXPR="$1"
     shift
 done
