@@ -36,6 +36,7 @@ map // "sy/<C-R>s<CR>
 map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
 map gt <C-P><C-\>w
 map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
+map gb :call SetGrep()<CR>:grep! "<C-R>/"<CR>:cw<CR>
 map gm :call NextGrepMode()<CR>
 
 "XXX: clean it
@@ -204,7 +205,6 @@ function! ShowConf(r)
         let s:ftd = filter(copy(lst), 'v:val!~"^\[ \]*#"')
     else
         let c = ["# Put your test commands here and choose one later with `cx`", "#"]
-        let c = c + ["# $BDIR = ./build/%BUILD_MODE%"]
         let c = c + ["# %BUILD_MODE% - substituted with current build mode", "#"]
         if (writefile(c, $HOME."/.vimrc_run_cmds"))
             echo "error writing ".$HOME."/.vimrc_run_cmds"
