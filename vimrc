@@ -187,19 +187,27 @@ endfunction
 function! ShowConf(r)
     redraw!
     echohl WarningMsg
-    echo "ccbr : c+[c]onfig+[b]uild+[r]un"
-    echo "<F5> : start debug"
-    echo "====================="
+    echo "ctrl+n = nerdtree | ctrl+p = file open | \\be = buff explorer | <F4> = .cpp->.hpp->..."
+    echo "\\e = subst word with buffer | \\k = dark/light | \\h = history | // = search selection"
+    echo "grep: gw = word | gs = selection | gb = buffer | gm = mode | gt = ctrlp word @cursor"
+    echo "ccbr : c+[c]onfig+[b]uild+[r]un | cD : rm %BUILD_MODE% | <F5> : start debug"
     echohl None
+    echo "====================="
     echo "Current settings are:"
     echo "====================="
-    echo "Build [m]ode : ".g:build_mode
-    echo "Run/debug command : ".MkRunCmd(s:run_cmd)
+    echo "Build [m]ode : "
+    echohl QuickFixLine
+    echon g:build_mode
+    echohl None
+    echo "Run/debug command : "
+    echohl QuickFixLine
+    echon MkRunCmd(s:run_cmd)
+    echohl None
     echo "[e]dit list below"
     if !a:r
         return 0
     endif
-    let s:ftd = get(s:, 'ftd', [])
+    let s:ftd = get(s:, 'ftd', []) 
     if filereadable($HOME."/.vimrc_run_cmds")
         let lst = filter(copy(readfile($HOME."/.vimrc_run_cmds")), 'v:val!~"^$"')
         let s:ftd = filter(copy(lst), 'v:val!~"^\[ \]*#"')
@@ -215,10 +223,15 @@ function! ShowConf(r)
 endfunction
 
 function! ShowChoice(l)
-    let idx = 0
-    for line in a:l
-        let p = idx==s:sel ? '>' : ' '
+    let idx = 0 
+    for line in a:l 
+        let p = ' ' 
+        if idx==s:sel
+           let p = '>' 
+           echohl Visual
+        endif
         echo p." ".line
+        echohl None
         let idx += 1
     endfor
 endfunction
