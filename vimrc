@@ -186,7 +186,7 @@ endfunction
 
 function! ShowConf(r)
     redraw!
-    echohl WarningMsg
+    echohl MoreMsg
     echo "ctrl+n = nerdtree | ctrl+p = file open | \\be = buff explorer | <F4> = .cpp->.hpp->..."
     echo "\\e = subst word with buffer | \\k = dark/light | \\h = history | // = search selection"
     echo "grep: gw = word | gs = selection | gb = buffer | gm = mode | gt = ctrlp word @cursor"
@@ -228,7 +228,7 @@ function! ShowChoice(l)
         let p = ' ' 
         if idx==s:sel
            let p = '>' 
-           echohl Visual
+           echohl Underlined
         endif
         echo p." ".line
         echohl None
