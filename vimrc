@@ -279,3 +279,6 @@ if &diff
     syntax off
     colorscheme evening
 endif
+"XXX use @linux only
+"let g:NERDTreeDirArrowExpandable = '+'
+"let g:NERDTreeDirArrowCollapsible = 'v'

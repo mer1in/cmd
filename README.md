@@ -3,7 +3,7 @@ cmd line tools
 
 ctrl+c ctrl+v
 -------------
-> `git clone https://github.com/mer1in/v && cd v && ./install.sh`
+> `cd; git clone https://github.com/mer1in/v; cd v && ./install.sh`
 
 v
 -
@@ -40,9 +40,13 @@ no params - list of changed files
 -r - revert all changes
 ```
 
+cdr
+---
+go to the project root
+
 install.sh
 ----------
-update && cp into `/usr/local/bin/`
+update && set aliases in ~/.bashrc
 
 todo
 ----
