@@ -10,7 +10,7 @@ v
 open file my-file @line 122
 > `v my-file:122:`
 
-gred 
+gred [--help]
 ----
 grep and edit
 > `gred 'sed .*A'`
@@ -27,7 +27,7 @@ grep and edit
 > `3`
 opens file README.md on line 16 with expr `sed .*A` in search buffer
 
-svd
+svd [--help]
 ---
 simplify svn diff:
 ```
