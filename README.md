@@ -60,3 +60,4 @@ svd
 
 vimrc
 - buffexplorer @darwin
+- load first cmd on open from ~/.vimrc_run_cmds
