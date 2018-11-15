@@ -61,3 +61,4 @@ svd
 vimrc
 - buffexplorer @darwin
 - load first cmd on open from ~/.vimrc_run_cmds
+- get g:ext_groups from gred - dont duplicate
