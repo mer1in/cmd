@@ -51,8 +51,6 @@ update && set aliases in ~/.bashrc
 todo
 ----
 gred
-- add keys:
-    - --name '*.ext':  search only ext files
 - choose multiple files to open
 
 svd
