@@ -20,6 +20,7 @@ alias cdr='cd \$(~/.v.utils/cdr)'
 alias gred='~/.v.utils/gred'
 alias svd='~/.v.utils/svd'
 alias v='~/.v.utils/v'
+alias vup='(H=~/.v.utils/src ; ([ -d \$H ] || git clone https://github.com/mer1in/v \$H) && cd \$H && ./install.sh)'
 #_V_UTILS_END_
 EOM
 ~/.v.utils/v --up
