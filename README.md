@@ -3,7 +3,7 @@ cmd line tools
 
 ctrl+c ctrl+v
 -------------
-> `cd; git clone https://github.com/mer1in/v; cd v && ./install.sh`
+> `(cd /tmp && git clone https://github.com/mer1in/v && cd v && ./install.sh)`
 
 v
 -
