@@ -8,6 +8,7 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jlanzarotta/bufexplorer'
 Plugin 'Conque-GDB'
+Plugin 'https://github.com/regedarek/ZoomWin'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -279,6 +280,12 @@ if &diff
     syntax off
     colorscheme evening
 endif
+function! SourceIfExists(file)
+  if filereadable(expand(a:file))
+    exe 'source' a:file
+  endif
+endfunction
+call SourceIfExists("~/.vimrc.local")
 "XXX use @linux only
 "let g:NERDTreeDirArrowExpandable = '+'
 "let g:NERDTreeDirArrowCollapsible = 'v'
