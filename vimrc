@@ -20,7 +20,7 @@ set hlsearch
 set foldmethod=syntax
 set nofoldenable
 
-map <Leader>e :%s/\<<C-R><C-w>\>/<C-R>"/g<CR>
+map <Leader>e :%s/<C-R>//<C-R><C-w>/g<CR>
 
 map <Tab> ]c
 map <S-Tab> [c
