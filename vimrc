@@ -190,8 +190,8 @@ function! ShowConf(r)
     echohl MoreMsg
     echo "ctrl+n = nerdtree | ctrl+p = file open | \\be = buff explorer | <F4> = .cpp->.hpp->..."
     echo "\\e = subst word with buffer | \\k = dark/light | \\h = history | // = search selection"
-    echo "grep: gw = word | gs = selection | gb = buffer | gm = mode | gt = ctrlp word @cursor"
-    echo "ccbr : c+[c]onfig+[b]uild+[r]un | cD : rm %BUILD_MODE% | <F5> : start debug"
+    echo "grep: gw: word; gs: selection; gb: buffer; gm: mode; gt: ctrlp word @cursor"
+    echo "ccbr: c+[c]onfig+[b]uild+[r]un | cD: rm %BUILD_MODE% | cp: yank path | <F5>: start debug"
     echohl None
     echo "====================="
     echo "Current settings are:"
@@ -266,6 +266,7 @@ function! HandleKey(lst)
     return 1
 endfunction
 
+nmap cp :let @" = expand("%")<cr>
 map cm :call NextBuildMode()<CR>
 map cc :call Compile(1,0,0)<CR>
 map ccb :call Compile(1,1,0)<CR>/\c\<error\><CR>
