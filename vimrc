@@ -34,6 +34,8 @@ let g:grep_mode='auto'
 let g:ext_groups = {'cpp': ['c','h','cpp','hpp','inl','cu'], 'cmake': ['cmake','txt'], 'py': ['py'], 'js': ['js', 'jsx', 'json', 'coffee']}
 
 map // "sy/<C-R>s<CR>
+map gp :let @/ = substitute(expand("%"), '.*\/', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
+map gP :let @/ = substitute(substitute(expand("%"), '.*\/', '', ''), '\..*', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
 map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
 map gt <C-P><C-\>w
 map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
@@ -190,7 +192,7 @@ function! ShowConf(r)
     echohl MoreMsg
     echo "ctrl+n = nerdtree | ctrl+p = file open | \\be = buff explorer | <F4> = .cpp->.hpp->..."
     echo "\\e = subst word with buffer | \\k = dark/light | \\h = history | // = search selection"
-    echo "grep: gw: word; gs: selection; gb: buffer; gm: mode; gt: ctrlp word @cursor"
+    echo "grep: gw: word; gs: selection; gb: buffer; gm: mode; g[pP] path (NOEXT); gt: ctrlp word @cursor"
     echo "ccbr: c+[c]onfig+[b]uild+[r]un | cD: rm %BUILD_MODE% | cp: yank path | <F5>: start debug"
     echohl None
     echo "====================="
