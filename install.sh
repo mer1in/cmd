@@ -3,7 +3,7 @@ git pull
 VIMRC=~/.vimrc
 if [ `uname -s` = Darwin ]; then
     EXTENDED_REGEXP_KEY=E
-    VRC_EXCLUDE='jlanzarotta/bufexplorer Conque-GDB'
+    VRC_EXCLUDE='Conque-GDB'
     [ -f ~/.bashrc ] && sed -i '' '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
 else
     EXTENDED_REGEXP_KEY=r
