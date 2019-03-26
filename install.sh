@@ -2,8 +2,10 @@
 git pull
 VIMRC=~/.vimrc
 if [ `uname -s` = Darwin ]; then
+    OS=DARWIN
     EXTENDED_REGEXP_KEY=E
     VRC_EXCLUDE='Conque-GDB'
+    [ -z "`which wget`" ] && brew install wget
     [ -f ~/.bashrc ] && sed -i '' '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
 else
     EXTENDED_REGEXP_KEY=r
@@ -11,7 +13,7 @@ else
     [ -f ~/.bashrc ] && sed -i '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
 fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
-mkdir -p ~/.v.utils 2>/dev/null
+mkdir -p ~/.v.utils/tmp 2>/dev/null
 for a in v gred svd cdr; do cp $a ~/.v.utils/; chmod +x ~/.v.utils/$a; done
 rm gred
 cp vimrc vimrc.tmp
@@ -30,3 +32,13 @@ alias vup='(H=~/.v.utils/src ; ([ -d \$H ] || git clone https://github.com/mer1i
 #_V_UTILS_END_
 EOM
 ~/.v.utils/v --up
+
+if [ $OS = 'DARWIN' ] && [ ! -f ~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/libclang.dylib ]; then
+    cd ~/.v.utils/tmp
+    wget http://releases.llvm.org/8.0.0/clang+llvm-8.0.0-x86_64-apple-darwin.tar.xz
+    tar xf clang+llvm-8.0.0-x86_64-apple-darwin.tar.xz
+    mv clang+llvm-8.0.0-x86_64-apple-darwin clang
+    cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=~/.v.utils/tmp/clang . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
+    cmake --build . --target ycm_core
+    rm -fr ~/.v.utils/tmp/* 2>/dev/null
+fi

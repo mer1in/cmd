@@ -9,6 +9,7 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'jlanzarotta/bufexplorer'
 Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
+Plugin 'Valloric/YouCompleteMe'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -19,6 +20,7 @@ set number
 set hlsearch
 set foldmethod=syntax
 set nofoldenable
+set encoding=utf-8
 
 map <Leader>e :%s/<C-R>//<C-R><C-w>/g<CR>
 
