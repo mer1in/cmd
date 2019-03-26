@@ -37,7 +37,7 @@ if [ $OS = Darwin ]; then
     YCM_LIBFILE=~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/libclang.dylib
     YCM_ARCHIVE=clang+llvm-8.0.0-x86_64-apple-darwin
 else
-    YCM_LIBFILE=~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/libclang.dylib
+    YCM_LIBFILE=~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/libclang.so.8
     YCM_ARCHIVE=clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-`lsb_release -a|grep Release|awk '{print $2}' 2>/dev/null`
 fi
 
