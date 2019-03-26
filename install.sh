@@ -50,3 +50,4 @@ if [ ! -f $YCM_LIBFILE ]; then
     cmake --build . --target ycm_core
     rm -fr ~/.v.utils/tmp/* 2>/dev/null
 fi
+(cd ~/.vim/bundle/YouCompleteMe/third_party/ycmd; [ -d third_party/tsserver/lib/node_modules ] || npm install -g --prefix third_party/tsserver typescript)
