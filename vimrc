@@ -21,6 +21,7 @@ set hlsearch
 set foldmethod=syntax
 set nofoldenable
 set encoding=utf-8
+let g:ycm_server_python_interpreter='/usr/bin/python'
 
 map <Leader>e :%s/<C-R>//<C-R><C-w>/g<CR>
 

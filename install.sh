@@ -4,8 +4,8 @@ VIMRC=~/.vimrc
 OS=`uname -s`
 if [ $OS = Darwin ]; then
     EXTENDED_REGEXP_KEY=E
-    VRC_EXCLUDE='Conque-GDB'
-    [ -z "`which wget`" ] && brew install wget
+    VRC_EXCLUDE='Conque-GDB ycm_server_python_interpreter'
+    for dep in wget cmake; do [ -z "`which $dep`" ] && brew install $dep; done
     [ -f ~/.bashrc ] && sed -i '' '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
 else
     EXTENDED_REGEXP_KEY=r
