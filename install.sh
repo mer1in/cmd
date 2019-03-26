@@ -1,8 +1,8 @@
 #!/bin/bash
 git pull
 VIMRC=~/.vimrc
-if [ `uname -s` = Darwin ]; then
-    OS=DARWIN
+OS=`uname -s`
+if [ $OS = Darwin ]; then
     EXTENDED_REGEXP_KEY=E
     VRC_EXCLUDE='Conque-GDB'
     [ -z "`which wget`" ] && brew install wget
@@ -33,7 +33,7 @@ alias vup='(H=~/.v.utils/src ; ([ -d \$H ] || git clone https://github.com/mer1i
 EOM
 ~/.v.utils/v --up
 
-if [ $OS = 'DARWIN' ] && [ ! -f ~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/libclang.dylib ]; then
+if [ $OS = Darwin ] && [ ! -f ~/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/libclang.dylib ]; then
     cd ~/.v.utils/tmp
     wget http://releases.llvm.org/8.0.0/clang+llvm-8.0.0-x86_64-apple-darwin.tar.xz
     tar xf clang+llvm-8.0.0-x86_64-apple-darwin.tar.xz
