@@ -64,30 +64,42 @@ let args = [`${!vargs.nc ? '--color=always' : ''}`,
 if (vargs.verbose)
     log('grep '+args.join(' '));
 let kid = spawn('grep', args);
-let buf = [];
+let buf_printed = 0;
+let buf = '';
 let err = '';
 kid.stdout.on('data', ch=>{
-    let lines = ch.toString().split('\n');
-    buf = buf.concat(lines);
-    log(lines.filter(l=>l).map((l, i)=>i+1+':'+l).join(eol));
+    buf += ch.toString();
+    buf.split('\n').filter(l=>l).forEach((l, i, a)=>{
+        if (i<buf_printed || i>a.length-2)
+            return;
+        log(i+1+':'+l);
+        buf_printed++;
+    });
 });
 kid.stderr.on('data', ch=>err += ch.toString());
 kid.on('close', e=>{
+    let files = {};
+    const add_file = n=>files[buf[0+n-1].replace(re, '')
+        .replace(/:.*/g, '')] = buf[0+n-1].replace(/[^:]*:/, '')
+        .replace(/:.*/, '');
+    buf = buf.split('\n').filter(l=>l).map(l=>l.replace(/\r/g, ''));
+    log(buf.length+':'+buf[buf.length-1]);
     if (e)
         log('error: '+err) || process.exit();
-    if (vargs.ni)
+    if (vargs.ni || !buf.length)
         process.exit();
+    buf.forEach((l, i)=>add_file(i+1));
+    log(Object.keys(files).length+' files found');
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
     });
     rl.on('line', line=>{
-        if (!line)
-            process.exit();
-        let files = {};
-        line.split(' ').forEach(n=>files[buf[0+n-1].replace(re, '')
-            .replace(/:.*/g, '')] = buf[0+n-1].replace(/[^:]*:/, '')
-            .replace(/:.*/, ''));
+        if (line)
+        {
+            files = {};
+            line.split(' ').forEach(add_file);
+        }
         let args = Object.keys(files), vim = 'vim', qts = '';
         let ops = {stdio: 'inherit'};
         let search_str = `+/${vargs.ci ? '\\c' : ''}${qts}`+
