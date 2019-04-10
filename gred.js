@@ -89,11 +89,15 @@ kid.on('close', e=>{
             .replace(/:.*/, ''));
         let args = Object.keys(files);
         let vim = 'vim';
+        let qts = '';
         if (process.platform === "win32")
+        {
             vim = 'c:\\windows\\vim.bat';
+            qts = '"';
+        }
         spawn(vim, [...args, `-O${args.length>3 ? 3 : args.length}`,
-            `+/${vargs.ci ? '\\c' : ''}${expr.join('\\\|')}`, '-c', files[args[0]]
-                .replace(re, '')],
+            `+/${vargs.ci ? '\\c' : ''}${qts}${expr.join('\\\|')}${qts}`,
+            '-c', files[args[0]].replace(re, '')],
             {stdio: 'inherit'});
         rl.close();
     });
