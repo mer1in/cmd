@@ -4,6 +4,7 @@ const { spawn } = require('child_process');
 const readline = require('readline');
 const eol=os.EOL;
 const log = console.log;
+const assign = Object.assign;
 const q = s=>s.join(' ').split(' ');
 const fl = (s, i)=>s+' '.repeat(i-s.length);
 const vargs = {p: [], x: ['.svn', '.git', 'build', 'node_modules'], i: [], xn: []};
@@ -87,18 +88,20 @@ kid.on('close', e=>{
         line.split(' ').forEach(n=>files[buf[0+n-1].replace(re, '')
             .replace(/:.*/g, '')] = buf[0+n-1].replace(/[^:]*:/, '')
             .replace(/:.*/, ''));
-        let args = Object.keys(files);
-        let vim = 'vim';
-        let qts = '';
+        let args = Object.keys(files), vim = 'vim', qts = '';
+        let ops = {stdio: 'inherit'};
+        let search_str = `+/${vargs.ci ? '\\c' : ''}${qts}`+
+            `${expr.join('\\\|')}${qts}`;
         if (process.platform === "win32")
         {
             vim = 'c:\\windows\\vim.bat';
             qts = '"';
+            search_str = `+/${vargs.ci ? '\\c' : ''}${qts}`+
+                `${expr.join('\\%PSM%')}${qts}`
+            ops = assign(ops, {shell: true, env: assign(process.env, {PSM: '|'})});
         }
         spawn(vim, [...args, `-O${args.length>3 ? 3 : args.length}`,
-            `+/${vargs.ci ? '\\c' : ''}${qts}${expr.join('\\\|')}${qts}`,
-            '-c', files[args[0]].replace(re, '')],
-            {stdio: 'inherit'});
+            search_str, '-c', files[args[0]].replace(re, '')], ops);
         rl.close();
     });
 });
