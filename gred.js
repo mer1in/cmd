@@ -66,7 +66,7 @@ let kid = spawn('grep', args);
 let buf = [];
 let err = '';
 kid.stdout.on('data', ch=>{
-    let lines = ch.toString().split(eol);
+    let lines = ch.toString().split('\n');
     buf = buf.concat(lines);
     log(lines.filter(l=>l).map((l, i)=>i+1+':'+l).join(eol));
 });
@@ -88,9 +88,12 @@ kid.on('close', e=>{
             .replace(/:.*/g, '')] = buf[0+n-1].replace(/[^:]*:/, '')
             .replace(/:.*/, ''));
         let args = Object.keys(files);
-        log(args);
-        spawn('vim', [...args, `-O${args.length>3 ? 3 : args.length}`,
-            `+/${vargs.ci ? '\\c' : ''}${expr.join('\\\|')}`, '-c', files[args[0]]],
+        let vim = 'vim';
+        if (process.platform === "win32")
+            vim = 'c:\\windows\\vim.bat';
+        spawn(vim, [...args, `-O${args.length>3 ? 3 : args.length}`,
+            `+/${vargs.ci ? '\\c' : ''}${expr.join('\\\|')}`, '-c', files[args[0]]
+                .replace(re, '')],
             {stdio: 'inherit'});
         rl.close();
     });
