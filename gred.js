@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 const os = require('os');
 const { spawn } = require('child_process');
+const stripAnsi = require('strip-ansi');
+const chalk = require('chalk');
 const readline = require('readline');
 const eol=os.EOL;
 const log = console.log;
@@ -67,12 +69,18 @@ let kid = spawn('grep', args);
 let buf_printed = 0;
 let buf = '';
 let err = '';
+const printLine = (i, l)=>{
+    if (vargs.nc)
+        return log(i+':'+l);
+    let ms = l.match(/([^:]+)/g);
+    log(chalk.red(i)+':'+chalk`{yellow ${stripAnsi(ms[0])}}:{green ${stripAnsi(ms[1])}}:${ms[2]}`);
+};
 kid.stdout.on('data', ch=>{
     buf += ch.toString();
     buf.split('\n').filter(l=>l).forEach((l, i, a)=>{
         if (i<buf_printed || i>a.length-2)
             return;
-        log(i+1+':'+l);
+        printLine(i+1, l);
         buf_printed++;
     });
 });
@@ -83,7 +91,7 @@ kid.on('close', e=>{
         .replace(/:.*/g, '')] = buf[0+n-1].replace(/[^:]*:/, '')
         .replace(/:.*/, '');
     buf = buf.split('\n').filter(l=>l).map(l=>l.replace(/\r/g, ''));
-    log(buf.length+':'+buf[buf.length-1]);
+    printLine(buf.length, buf[buf.length-1]);
     if (e)
         log('error: '+err) || process.exit();
     if (vargs.ni || !buf.length)
