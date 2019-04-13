@@ -12,6 +12,7 @@ Plugin 'https://github.com/regedarek/ZoomWin'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'juneedahamed/svnj.vim'
+Plugin 'airblade/vim-gitgutter'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
