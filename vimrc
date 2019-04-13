@@ -10,6 +10,8 @@ Plugin 'jlanzarotta/bufexplorer'
 Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'tpope/vim-fugitive'
+Plugin 'juneedahamed/svnj.vim'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
