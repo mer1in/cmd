@@ -13,6 +13,8 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'juneedahamed/svnj.vim'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -109,6 +111,7 @@ endfunction
 
 map <F5> :execute('ConqueGdb --args '.MkRunCmd(g:run_cmd))<CR>b *main<CR>run<CR>
 map <Leader>k :call Background()<CR>
+map <Leader>l :call Numbers()<CR>
 nmap <Leader>h :brow old<CR>
 
 set laststatus=2
@@ -129,6 +132,21 @@ function! NextBuildMode()
             return
         endif
     endfor
+endfunction
+
+function! Numbers()
+    let g:current_numbers = get(g:, 'current_numbers', 0)
+    if g:current_numbers==2
+        let g:current_numbers = 0
+        exec(':set number')
+    elseif g:current_numbers==1
+        let g:current_numbers = 2
+        exec(':set nornu')
+        exec(':set nonu')
+    elseif g:current_numbers==0
+        let g:current_numbers = 1
+        exec(':set rnu')
+    endif
 endfunction
 
 function! Background()
