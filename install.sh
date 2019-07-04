@@ -48,6 +48,6 @@ if [ ! -f $YCM_LIBFILE ]; then
     mv $YCM_ARCHIVE clang
     cmake -G "Unix Makefiles" -DPATH_TO_LLVM_ROOT=~/.v.utils/tmp/clang . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
     cmake --build . --target ycm_core
-    rm -fr ~/.v.utils/tmp/* 2>/dev/null
+#    rm -fr ~/.v.utils/tmp/* 2>/dev/null
 fi
 (cd ~/.vim/bundle/YouCompleteMe/third_party/ycmd; [ -d third_party/tsserver/lib/node_modules ] || npm install -g --prefix third_party/tsserver typescript)
