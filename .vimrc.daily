@@ -1,0 +1,47 @@
+" Daily log helper
+"
+" Usage:
+" 1. save this file to home folder
+"
+" 2. add the following code to ~/.vimrc
+" function! SourceIfExists(file)
+"  if filereadable(expand(a:file))
+"    exe 'source' a:file
+"  endif
+" endfunction
+" call SourceIfExists("~/.vimrc.daily")
+"
+" 3. in your daily insert word "new", hit Esc and ctrl+Space
+
+function! Daily()
+python3 << EOF
+import vim, re
+from datetime import date
+(row, col) = vim.current.window.cursor
+buf =  vim.current.buffer
+line =  buf[row-1]
+if (list(filter(None, line.split()))[0]=="new"):
+    tasks = []
+    c = row
+    while (not re.match("^\d{2}\.\d{2}\.\d{4}$", buf[c])):
+        if (not buf[c].strip()):
+            del buf[c]
+        else:
+            c = c+1
+    c = c+1
+    while (buf[c].strip()):
+        l = buf[c]
+        if (re.search('^[\*\-\?b]', l.strip())):
+            tasks.append(re.split('\n', re.split(' =[^ ]+',l)[0])[0]+'\n')
+        c = c+1
+    tasks.append('')
+    tasks.reverse()
+    buf[row-1] = date.today().strftime('%d.%m.%Y')
+    for task in tasks:
+        buf.append(task, row)
+# TBD
+#elseif (list(filter(None, line.split()))[0]=="diff"):
+#elseif (list(filter(None, line.split()))[0]=="help"):
+EOF
+endfunction
+nmap <C-@> :call Daily()<CR>

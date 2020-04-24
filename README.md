@@ -54,7 +54,7 @@ gred
 - choose multiple files to open
 
 svd
-- support git
+c support git =use fugitive
 
 vimrc
 - load first cmd on open from ~/.vimrc_run_cmds
