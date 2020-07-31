@@ -23,5 +23,12 @@ if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 }else{
 	# Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList "-NoExit","-Command", "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ; $($MyInvocation.MyCommand.Source)"
     Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList "-Command", "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ; $($MyInvocation.MyCommand.Source)"
+
+    # install posh-git
+    Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+    scoop bucket add extras
+    scoopinstall posh-git
+    scoop install posh-git
+    Add-PoshGitToProfile
 }
 
