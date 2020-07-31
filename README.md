@@ -5,6 +5,8 @@ ctrl+c ctrl+v
 -------------
 > `(cd /tmp && git clone https://github.com/mer1in/v && cd v && ./install.sh)`
 
+> `Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://github.com/mer1in/v/raw/master/install.ps1'))`
+
 v
 -
 open file my-file @line 122
