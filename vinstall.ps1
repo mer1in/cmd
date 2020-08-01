@@ -18,8 +18,8 @@ if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 		choco install -y python --version=3.6.8
 	}
 	# get latest by always upgrade
-	choco install -y vim git git-lfs googlechrome
-	choco upgrade -y vim git git-lfs googlechrome
+	choco install -y vim git git-lfs poshgit googlechrome
+	choco upgrade -y vim git git-lfs poshgit googlechrome
 }else{
 	# Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList "-NoExit","-Command", "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ; $($MyInvocation.MyCommand.Source)"
     Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList "-Command", "$($MyInvocation.MyCommand.Source)"
