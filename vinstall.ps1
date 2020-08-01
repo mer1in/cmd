@@ -22,13 +22,6 @@ if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 	choco upgrade -y vim git git-lfs googlechrome
 }else{
 	# Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList "-NoExit","-Command", "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ; $($MyInvocation.MyCommand.Source)"
-    Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList "-Command", "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ; $($MyInvocation.MyCommand.Source)"
-
-    # install posh-git
-    iex (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-    Start-Process "$psHome\powershell.exe" -ArgumentList "-Command", "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ; scoop bucket add extras ; scoop install posh-git ; Add-PoshGitToProfile"
-#    scoop bucket add extras
-#    scoop install posh-git
-#    Add-PoshGitToProfile
+    Start-Process "$psHome\powershell.exe" -Verb Runas -ArgumentList "-Command", "$($MyInvocation.MyCommand.Source)"
 }
 
