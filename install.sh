@@ -34,9 +34,9 @@ alias svd='~/.v.utils/svd'
 alias v='~/.v.utils/v'
 alias vup='(H=~/.v.utils/src ; ([ -d \$H ] || git clone https://github.com/mer1in/v \$H) && cd \$H && ./install.sh)'
 alias gl="git log --graph --date=short --branches --pretty=format:'%C(yellow)%h%C(reset) %ad | %C(75)%s%C(reset) %C(yellow)%d%C(reset) [%an]'"
-alias lswd='[ -d ~/.cds ] && for a in `ls ~/.cds`; do echo "\$a = `cat ~/.cds/\$a`"; done'
+alias lswd='[ -d ~/.cds ] && for a in \`ls ~/.cds\`; do echo "\$a = \`cat ~/.cds/\$a\`"; done'
 for a in {a..z} ; do alias "scwd\$a=[ -d ~/.cds ] || mkdir ~/.cds ; pwd > ~/.cds/\$a" ; done
-for a in {a..z} ; do alias "cd\$a=[[ -d ~/.cds && -f ~/.cds/\$a ]] && cd \`cat ~/.cds/\$a\` || echo '\$a doesnt exist'" ; done
+for a in {a..z} ; do alias "cd\$a=[[ -d ~/.cds && -f ~/.cds/\$a ]] && cd \\\`cat ~/.cds/\$a\\\` || echo '\$a doesnt exist'" ; done
 alias cdr='cd \$(~/.v.utils/cdr)'
 alias scwdr='echo ERR'
 alias gut=git
