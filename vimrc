@@ -7,16 +7,20 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jlanzarotta/bufexplorer'
-Plugin 'Conque-GDB'
+"Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
-Plugin 'Valloric/YouCompleteMe'
+Plugin 'neoclide/coc.nvim'
+"Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+Plugin 'gregsexton/gitv'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
+set t_Co=256
+let g:airline_theme='base16_adwaita'
 set ts=4
 set sw=4
 set et
@@ -26,6 +30,9 @@ set foldmethod=syntax
 set nofoldenable
 set encoding=utf-8
 let g:ycm_server_python_interpreter='/usr/bin/python'
+
+map <Leader>qq :call ToggleHex()<CR>
+map <Leader>qr mp:%!xxd -r\|xxd<CR>`p
 
 map <Leader>e :%s/<C-R>//<C-R><C-w>/g<CR>
 
@@ -50,6 +57,17 @@ map gb :call SetGrep()<CR>:grep! "<C-R>/"<CR>:cw<CR>
 map gm :call NextGrepMode()<CR>
 
 "XXX: clean it
+function! ToggleHex()
+    let b:hex_mode = get(b:, 'hex_mode', 0)
+    if b:hex_mode
+        execute(':%!xxd -r')
+        let b:hex_mode = 0
+    else
+        execute(':%!xxd')
+        let b:hex_mode = 1
+    endif
+endfunction
+
 function! NextGrepMode()
     let gk = keys(g:ext_groups)
     call add(gk, 'auto')
@@ -111,6 +129,7 @@ endfunction
 map <F5> :execute('ConqueGdb --args '.MkRunCmd(g:run_cmd))<CR>b *main<CR>run<CR>
 map <Leader>k :call Background()<CR>
 map <Leader>l :call Numbers()<CR>
+map <Leader>j :GitGutterToggle<CR>
 nmap <Leader>h :brow old<CR>
 
 set laststatus=2
@@ -217,6 +236,7 @@ function! ShowConf(r)
     echo "\\e = subst word with buffer | \\k = dark/light | \\h = history | // = search selection"
     echo "grep: gw: word; gs: selection; gb: buffer; gm: mode; g[pP] path (NOEXT); gt: ctrlp word @cursor"
     echo "ccbr: c+[c]onfig+[b]uild+[r]un | cD: rm %BUILD_MODE% | cp: yank path | <F5>: start debug"
+    echo "\\qq: tooggle hex | \\qr refresh hex"
     echohl None
     echo "====================="
     echo "Current settings are:"
@@ -413,3 +433,4 @@ call SourceIfExists("~/.vimrc.local")
 "XXX use @linux only
 "let g:NERDTreeDirArrowExpandable = '+'
 "let g:NERDTreeDirArrowCollapsible = 'v'
+let g:ctrlp_working_path_mode = 'c'
