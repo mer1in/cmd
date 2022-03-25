@@ -1,0 +1,78 @@
+[ -f ~/.git-completion.bash ] && . ~/.git-completion.bash
+[ -f ~/.git-prompt.sh ] && . ~/.git-prompt.sh
+GIT_PS1_SHOWDIRTYSTATE=YES
+GIT_PS1_SHOWUNTRACKEDFILES=YES
+GIT_PS1_SHOWUPSTREAM="auto"
+
+while read name fg bg attr ; do
+    a="\e[21m"
+    [[ $attr == "BOLD" ]] && a="\e[1m"
+    [[ $attr == "DIM" ]] && a="\e[2m"
+    [[ $attr == "INVERT" ]] && a="\e[7m"
+    [[ $fg == "NONE" ]] && FG="" || FG="\e[38;5;${fg}m"
+    [[ $bg == "NONE" ]] && BG="" || BG="\e[48;5;${bg}m"
+    eval $name="'\[\e[0m${FG}${BG}$a\]'"
+done << COLORS
+BLUE_ON_GREY 20 248 NORM
+GREY_ON_NONE 248 NONE INVERT
+GREY_ON_BLUE 248 117 NORM
+BLUE_ON_BLUE 21 117 NORM
+BLUE_ON_GREEN 117 113 NORM
+GREY_ON_GREEN 236 113 NORM
+GREEN_ON_YELLOW 113 228 NORM
+GREEN_ON_NONE 113 NONE NORM
+LT_GREY_ON_YELLOW 241 228 BOLD
+DK_GREEN_ON_YELLOW 34 228 BOLD
+RED_ON_YELLOW 160 228 BOLD
+CYAN_ON_YELLOW 201 228 BOLD
+BLUE_ON_BROWN 117 130 NORM
+BROWN_ON_YELLOW 88 228 NORM
+BROWN_ON_GREEN 130 113 NORM
+YELLOW_ON_BROWN 226 130 NORM
+YELLOW_ON_NONE 228 NONE NORM
+GREEN_ON_GREY 28 248 BOLD
+RED_ON_GREY 160 248 BOLD
+COLORS
+RST="\[\e[0m\]"
+
+function color_my_prompt {
+  local EXIT="$?"
+  local __git_branch_color="$DK_GREEN_ON_YELLOW"
+  local __git_branch=$(__git_ps1);
+
+  # colour branch name depending on state
+  if [[ "${__git_branch}" =~ "*" ]]; then     # if repository is dirty
+      __git_branch_color="$RED_ON_YELLOW"
+  elif [[ "${__git_branch}" =~ "$" ]]; then   # if there is something stashed
+      __git_branch_color="$BROWN_ON_YELLOW"
+  elif [[ "${__git_branch}" =~ "%" ]]; then   # if there are only untracked files
+      __git_branch_color="$LT_GREY_ON_YELLOW"
+  elif [[ "${__git_branch}" =~ "+" ]]; then   # if there are staged files
+      __git_branch_color="$CYAN_ON_YELLOW"
+  fi
+
+  if [ -n "$__git_branch" ] ; then
+      GIT_STATUS="${GREEN_ON_YELLOW}$__git_branch_color$__git_branch ${YELLOW_ON_NONE}"
+  else
+      GIT_STATUS="${GREEN_ON_NONE}"
+  fi
+
+  if (( $EXIT )) ; then
+      CMD_STATUS="${RED_ON_GREY}✗"
+  else
+      CMD_STATUS="${GREEN_ON_GREY}✓"
+  fi
+
+  PYTHON_VIRTUALENV="${BLUE_ON_GREEN}"
+  if [ -n "$VIRTUAL_ENV" ] ; then
+      PYTHON_VIRTUALENV="${BLUE_ON_BROWN}${YELLOW_ON_BROWN}`basename \"$VIRTUAL_ENV\"`${BROWN_ON_GREEN}"
+  fi
+
+  PS1="${BLUE_ON_GREY}\u${GREY_ON_BLUE}"
+  PS1="$PS1${BLUE_ON_BLUE}\h${PYTHON_VIRTUALENV}"
+  PS1="$PS1${GREY_ON_GREEN}\w${GIT_STATUS}${RST}\n"
+  PS1="$PS1${BLUE_ON_GREY} $CMD_STATUS ${GREY_ON_NONE}$RST "
+}
+export PROMPT_COMMAND=color_my_prompt
+
+

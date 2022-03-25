@@ -7,6 +7,9 @@ if [ $OS = Darwin ]; then
     VRC_EXCLUDE='Conque-GDB ycm_server_python_interpreter'
     for dep in wget cmake; do [ -z "`which $dep`" ] && brew install $dep; done
     [ -f ~/.bashrc ] && sed -i '' '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
+    for f in git-prompt.sh git-completion.bash ; do 
+        [ -f ~/.$f ] || curl https://raw.githubusercontent.com/git/git/master/contrib/completion/$f -o ~/.$f
+    done
 else
     EXTENDED_REGEXP_KEY=r
     VRC_EXCLUDE=XXXXXXX
@@ -24,11 +27,19 @@ done
 rm vimrc.tmp
 cat <<EOM >>~/.bashrc
 #_V_UTILS_BEGIN_
-alias cdr='cd \$(~/.v.utils/cdr)'
+[ -f ~/.bashrc_prompt ] && . ~/.bashrc_prompt
+
 alias gred='~/.v.utils/gred'
 alias svd='~/.v.utils/svd'
 alias v='~/.v.utils/v'
 alias vup='(H=~/.v.utils/src ; ([ -d \$H ] || git clone https://github.com/mer1in/v \$H) && cd \$H && ./install.sh)'
+alias gl="git log --graph --date=short --branches --pretty=format:'%C(yellow)%h%C(reset) %ad | %C(75)%s%C(reset) %C(yellow)%d%C(reset) [%an]'"
+alias lswd='[ -d ~/.cds ] && for a in `ls ~/.cds`; do echo "\$a = `cat ~/.cds/\$a`"; done'
+for a in {a..z} ; do alias "scwd\$a=[ -d ~/.cds ] || mkdir ~/.cds ; pwd > ~/.cds/\$a" ; done
+for a in {a..z} ; do alias "cd\$a=[[ -d ~/.cds && -f ~/.cds/\$a ]] && cd \`cat ~/.cds/\$a\` || echo '\$a doesnt exist'" ; done
+alias cdr='cd \$(~/.v.utils/cdr)'
+alias scwdr='echo ERR'
+alias gut=git
 #_V_UTILS_END_
 EOM
 ~/.v.utils/v --up
