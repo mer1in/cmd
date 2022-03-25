@@ -51,15 +51,20 @@ LIST="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXP
 COUNT=$(echo $LIST|wc -w)
 echo "$COUNT files found"
 (( $COUNT )) || exit
-# TODO: choose more than one entry
 read I
 [ -z "$I" ] && { vim $LIST -O$(($COUNT<3?$COUNT:3)) +/"${SCI}${EXPR}" ; exit ; }
-while read line ; do
-    [ $I = "`echo $line|sed 's/:.*//'`" ] &&\
-        STRIPPED=`echo $line|sed -EXTENDED_REGEXP_KEY "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"` &&\
-        LINE_NUM="`echo $STRIPPED|sed 's/^[^:]*:[^:]*://;s/:.*//'`" &&\
-        EF=`echo $STRIPPED|sed -e 's/^[^:]*://;s/:.*//'` &&\
-        break
-done <$BUF_FILE
+for SELECTION in $I
+do
+    while read line ; do
+        if [ $SELECTION = "`echo $line|sed 's/:.*//'`" ]
+        then
+            STRIPPED=`echo $line|sed -E "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"`
+            [ -z $LINE_NUM ] && \
+                LINE_NUM="`echo $STRIPPED|sed 's/^[^:]*:[^:]*://;s/:.*//'`" || \
+                LINE_NUM=BufExplorer
+            EF="$EF `echo $STRIPPED|sed -e 's/^[^:]*://;s/:.*//'`"
+        fi
+    done <$BUF_FILE
+done
 [ -n "$EF" ] && [ -n "$LINE_NUM" ] && vim $EF +/"${SCI}${EXPR}" -c $LINE_NUM && exit
 echo "no entry #'$I'"
