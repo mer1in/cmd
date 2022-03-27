@@ -38,7 +38,7 @@ RST="\[\e[0m\]"
 function color_my_prompt {
   local EXIT="$?"
   local __git_branch_color="$DK_GREEN_ON_YELLOW"
-  local __git_branch=$(__git_ps1);
+  local __git_branch=`__git_ps1 %s`;
 
   # colour branch name depending on state
   if [[ "${__git_branch}" =~ "*" ]]; then     # if repository is dirty
@@ -52,16 +52,18 @@ function color_my_prompt {
   fi
 
   if [ -n "$__git_branch" ] ; then
-      GIT_STATUS="${GREEN_ON_YELLOW}$__git_branch_color$__git_branch ${YELLOW_ON_NONE}"
+      SYMB='➦'
+      [[ ${__git_branch/.../} == $__git_branch ]] && SYMB=''
+      GIT_STATUS="${GREEN_ON_YELLOW}${__git_branch_color} $SYMB ${__git_branch} ${YELLOW_ON_NONE}"
   else
       GIT_STATUS="${GREEN_ON_NONE}"
   fi
 
-  if (( $EXIT )) ; then
-      CMD_STATUS="${RED_ON_GREY}✗"
-  else
-      CMD_STATUS="${GREEN_ON_GREY}✓"
-  fi
+  BG_JOBS=""
+  (( $(jobs -l | wc -l) )) && BG_JOBS="${BLUE_ON_GREY}⏳ "
+
+  CMD_STATUS="${GREEN_ON_GREY}✓"
+  (( $EXIT )) && CMD_STATUS="${RED_ON_GREY}✗"
 
   PYTHON_VIRTUALENV="${BLUE_ON_GREEN}"
   if [ -n "$VIRTUAL_ENV" ] ; then
@@ -71,7 +73,7 @@ function color_my_prompt {
   PS1="${BLUE_ON_GREY}\u${GREY_ON_BLUE}"
   PS1="$PS1${BLUE_ON_BLUE}\h${PYTHON_VIRTUALENV}"
   PS1="$PS1${GREY_ON_GREEN}\w${GIT_STATUS}${RST}\n"
-  PS1="$PS1${BLUE_ON_GREY} $CMD_STATUS ${GREY_ON_NONE}$RST "
+  PS1="$PS1${BLUE_ON_GREY} $BG_JOBS$CMD_STATUS ${GREY_ON_NONE}$RST "
 }
 export PROMPT_COMMAND=color_my_prompt
 

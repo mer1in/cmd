@@ -1,4 +1,6 @@
 syntax on
+let g:solarized_termcolors=256
+colorscheme solarized
 set nocompatible              " be iMproved, required
 filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -128,6 +130,8 @@ endfunction
 
 map <F5> :execute('ConqueGdb --args '.MkRunCmd(g:run_cmd))<CR>b *main<CR>run<CR>
 map <Leader>k :call Background()<CR>
+map <Leader>d] :call DiffContrast('higher')<CR>
+map <Leader>d[ :call DiffContrast('lower')<CR>
 map <Leader>l :call Numbers()<CR>
 map <Leader>j :GitGutterToggle<CR>
 nmap <Leader>h :brow old<CR>
@@ -165,6 +169,27 @@ function! Numbers()
         let g:current_numbers = 1
         exec(':set rnu')
     endif
+endfunction
+
+function! DiffContrast(dir)
+    let g:solarized_diffmode = get(g:, 'solarized_diffmode', 'normal')
+    if 'lower'==a:dir
+        if 'normal'==g:solarized_diffmode
+            let g:solarized_diffmode = 'low'
+        endif
+        if 'high'==g:solarized_diffmode
+            let g:solarized_diffmode = 'normal'
+        endif
+    else
+        if 'normal'==g:solarized_diffmode
+            let g:solarized_diffmode = 'high'
+        endif
+        if 'low'==g:solarized_diffmode
+            let g:solarized_diffmode = 'normal'
+        endif
+    endif
+    let g:current_background = get(g:, 'current_background', 'dark')
+    exec(':set background='.g:current_background)
 endfunction
 
 function! Background()
@@ -234,9 +259,10 @@ function! ShowConf(r)
     echohl MoreMsg
     echo "ctrl+n = nerdtree | ctrl+p = file open | \\be = buff explorer | <F4> = .cpp->.hpp->..."
     echo "\\e = subst word with buffer | \\k = dark/light | \\h = history | // = search selection"
-    echo "grep: gw: word; gs: selection; gb: buffer; gm: mode; g[pP] path (NOEXT); gt: ctrlp word @cursor"
+    echo "\s[gsr] = search [google, stackoverflow, reddit] | gu = open url"
+    echo "grep: gw = word; gs = selection; gb = buffer; gm = mode; g[pP] path (NOEXT) | gt: ctrlp word @cursor"
     echo "ccbr: c+[c]onfig+[b]uild+[r]un | cD: rm %BUILD_MODE% | cp: yank path | <F5>: start debug"
-    echo "\\qq: tooggle hex | \\qr refresh hex"
+    echo "\\qq: tooggle hex | \\qr refresh hex | \d][: +-diff contrast"
     echohl None
     echo "====================="
     echo "Current settings are:"
@@ -322,10 +348,6 @@ map cr :call Compile(0,0,1)<CR>
 map cD :execute(':!rm -fr build/'.g:build_mode)<CR>
 map cx :call ShowMenu()<CR>
 
-if &diff
-    syntax off
-    colorscheme evening
-endif
 function! SourceIfExists(file)
   if filereadable(expand(a:file))
     exe 'source' a:file
