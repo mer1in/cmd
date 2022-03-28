@@ -47,6 +47,7 @@ alias scwdr='echo ERR'
 alias gut=git
 #_V_UTILS_END_
 EOM
+cp ./bashrc_prompt ~/.bashrc_prompt
 ~/.v.utils/v --up
 
 if [ $OS = Darwin ]; then
