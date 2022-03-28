@@ -18,6 +18,11 @@ fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
 for a in v gred svd cdr; do cp $a ~/.v.utils/; chmod +x ~/.v.utils/$a; done
+(
+    git clone https://github.com/altercation/vim-colors-solarized.git
+    mkdir -p ~/.vim/colors/
+    cp ./vim-colors-solarized/colors/solarized.vim ~/.vim/colors/
+)
 rm gred
 cp vimrc vimrc.tmp
 for e in $VRC_EXCLUDE ; do
