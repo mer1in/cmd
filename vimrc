@@ -33,6 +33,7 @@ set nofoldenable
 set encoding=utf-8
 let g:ycm_server_python_interpreter='/usr/bin/python'
 
+noremap gF :e <cfile><cr>
 map <Leader>qq :call ToggleHex()<CR>
 map <Leader>qr mp:%!xxd -r\|xxd<CR>`p
 
