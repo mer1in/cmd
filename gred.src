@@ -40,31 +40,22 @@ function cleanup {
 }
 trap cleanup EXIT SIGINT
 
-exec 4>&1
-exec 5>$BUF_FILE
 [ -n "$VERBOSE" ] && echo "grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr \"$EXPR\" $P"
 [ -n "$NONINTERACTIVE" ] && { grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" $P ;\
     exit ; }
-LIST="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" $P|\
-    tee >(cat|sed '='|sed 'N;s/\n/:/'|tee >((cat|sed 's/$/\n/') 1>&5) 1>&4)|
-    (sed -e 's,\x1B\[[0-9;]*[a-zA-Z],,g' -e 's,:.*,,'|sort -u)`" 
-COUNT=$(echo $LIST|wc -w)
-echo "$COUNT files found"
-(( $COUNT )) || exit
-read I
-[ -z "$I" ] && { vim $LIST -O$(($COUNT<3?$COUNT:3)) +/"${SCI}${EXPR}" ; exit ; }
-for SELECTION in $I
+FZFC="fzf -m --ansi"
+export FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info \
+    --preview='(f=\$(echo {}|sed 's/:.*//') && l=\$(echo {}|sed -e 's/^[^:]*://' -e 's/:.*//'); s=0; \
+        (( \$l>5 )) && let s=\$l-5; let e=\$l+30; \
+        BAT_PAGER=\"less -R +/$EXPR\" bat --style=numbers --color=always --line-range \$s:\$e \$f)' \
+    --preview-window='right' --bind='ctrl-p:toggle-preview,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-a:select-all+accept,ctrl-y:execute-silent(echo {+}|pbcopy)'"
+
+list="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" $P | $FZFC`"
+IFS=$(echo -en "\n\b")
+for i in $list
 do
-    while read line ; do
-        if [ $SELECTION = "`echo $line|sed 's/:.*//'`" ]
-        then
-            STRIPPED=`echo $line|sed -E "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"`
-            [ -z $LINE_NUM ] && \
-                LINE_NUM="`echo $STRIPPED|sed 's/^[^:]*:[^:]*://;s/:.*//'`" || \
-                LINE_NUM=BufExplorer
-            EF="$EF `echo $STRIPPED|sed -e 's/^[^:]*://;s/:.*//'`"
-        fi
-    done <$BUF_FILE
+    echo "item = $i"
+    file=`echo $i|sed 's/:.*//'`
+    files="$files $file"
 done
-[ -n "$EF" ] && [ -n "$LINE_NUM" ] && vim $EF +/"${SCI}${EXPR}" -c $LINE_NUM && exit
-echo "no entry #'$I'"
+[ -n "$files" ] && vim `echo $files | awk '{for(i=1; i<=NF; i++){map[$i]=1}} END{for(f in map){print f}}'` +/"${SCI}${EXPR}"
