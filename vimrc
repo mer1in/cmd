@@ -58,6 +58,7 @@ map gt <C-P><C-\>w
 map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
 map gb :call SetGrep()<CR>:grep! "<C-R>/"<CR>:cw<CR>
 map gm :call NextGrepMode()<CR>
+nmap br :let @t=@/<CR>?^```?es<CR>l"iy$j^mt/^```/<CR>kmb``:let @/=@t<CR>:'t,'bw !<C-R>i<CR>
 
 "XXX: clean it
 function! ToggleHex()
