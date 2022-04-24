@@ -21,6 +21,7 @@ Plugin 'gregsexton/gitv'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
+set backspace=indent,eol,start
 set t_Co=256
 let g:airline_theme='base16_adwaita'
 set ts=4
