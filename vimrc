@@ -6,7 +6,7 @@ filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'ctrlpvim/ctrlp.vim'
+"Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jlanzarotta/bufexplorer'
 "Plugin 'Conque-GDB'
@@ -18,8 +18,21 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'gregsexton/gitv'
+Plugin 'junegunn/fzf'
 call vundle#end()            " required
 filetype plugin indent on    " required
+
+"XXX: fix dup
+command! -bang -complete=dir -nargs=? FZFindPath
+    \ call fzf#run(fzf#wrap({'dir': <q-args>}, <bang>0))
+command! -bang -complete=dir -nargs=? FZFindPathQ
+    \ call fzf#run(fzf#wrap({'dir': <q-args>, 'options': ['--query', expand('<cword>')]}, <bang>0))
+function! FZFindGitRoot()
+    execute 'FZFindPath '.substitute(system('git rev-parse --show-toplevel 2>/dev/null || pwd'),'\n\+$', '', '')
+endfunction
+function! FZFindGitRootQ()
+    execute 'FZFindPathQ '.substitute(system('git rev-parse --show-toplevel 2>/dev/null || pwd'),'\n\+$', '', '')
+endfunction
 
 set backspace=indent,eol,start
 set t_Co=256
@@ -38,6 +51,10 @@ noremap gF :e <cfile><cr>
 map <Leader>qq :call ToggleHex()<CR>
 map <Leader>qr mp:%!xxd -r\|xxd<CR>`p
 
+map <Leader>p :FZFindPath<CR>
+map <C-P> :FZFindPath<CR>
+map <Leader>P :call FZFindGitRoot()<CR>
+
 map <Leader>e :%s/<C-R>//<C-R><C-w>/g<CR>
 
 map <Tab> ]c
@@ -55,11 +72,12 @@ map // "sy/<C-R>s<CR>
 map gp :let @/ = substitute(expand("%"), '.*\/', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
 map gP :let @/ = substitute(substitute(expand("%"), '.*\/', '', ''), '\..*', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
 map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
-map gt <C-P><C-\>w
+map gt :FZFindPathQ<CR>
+map gT :call FZFindGitRootQ()<CR>
 map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
 map gb :call SetGrep()<CR>:grep! "<C-R>/"<CR>:cw<CR>
 map gm :call NextGrepMode()<CR>
-nmap br :let @t=@/<CR>?^```?es<CR>l"iy$j^mt/^```/<CR>kmb``:let @/=@t<CR>:'t,'bw !<C-R>i<CR>
+nmap <leader>b :let @t=@/<CR>?^```?es<CR>l"iy$j^mt/^```/<CR>kmb``:let @/=@t<CR>:'t,'bw !<C-R>i<CR>
 
 "XXX: clean it
 function! ToggleHex()
@@ -262,9 +280,10 @@ function! ShowConf(r)
     echohl MoreMsg
     echo "ctrl+n = nerdtree | ctrl+p = file open | \\be = buff explorer | <F4> = .cpp->.hpp->..."
     echo "\\e = subst word with buffer | \\k = dark/light | \\h = history | // = search selection"
-    echo "\s[gsr] = search [google, stackoverflow, reddit] | gu = open url"
-    echo "grep: gw = word; gs = selection; gb = buffer; gm = mode; g[pP] path (NOEXT) | gt: ctrlp word @cursor"
+    echo "\\s[gsr] = search [google, stackoverflow, reddit] | gu = open url"
+    echo "grep: gw = word; gs = selection; gb = buffer; gm = mode; g[pP] path (NOEXT) | g[tT]: ctrlp word @cursor"
     echo "ccbr: c+[c]onfig+[b]uild+[r]un | cD: rm %BUILD_MODE% | cp: yank path | <F5>: start debug"
+    echo "\\b: run code block in triple backtick"
     echo "\\qq: tooggle hex | \\qr refresh hex | \d][: +-diff contrast"
     echohl None
     echo "====================="
@@ -459,3 +478,4 @@ call SourceIfExists("~/.vimrc.local")
 "let g:NERDTreeDirArrowExpandable = '+'
 "let g:NERDTreeDirArrowCollapsible = 'v'
 let g:ctrlp_working_path_mode = 'c'
+
