@@ -156,7 +156,7 @@ map <Leader>d] :call DiffContrast('higher')<CR>
 map <Leader>d[ :call DiffContrast('lower')<CR>
 map <Leader>l :call Numbers()<CR>
 map <Leader>j :GitGutterToggle<CR>
-nmap <Leader>h :fzf#vim#history()<CR>
+nmap <Leader>h :call fzf#vim#history()<CR>
 
 set laststatus=2
 set background=dark
