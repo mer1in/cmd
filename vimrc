@@ -19,6 +19,7 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'gregsexton/gitv'
 Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -63,7 +64,7 @@ map <S-Tab> [c
 map <F4> :call NextExt()<CR>
 map <C-N> :NERDTreeToggle<CR>
 
-set runtimepath^=~/.vim/bundle/ctrlp.vim
+"set runtimepath^=~/.vim/bundle/ctrlp.vim
 
 let g:grep_mode='auto'
 let g:ext_groups = {'cpp': ['c','h','cpp','hpp','inl','cu'], 'cmake': ['cmake','txt'], 'py': ['py'], 'js': ['js', 'jsx', 'json', 'coffee']}
@@ -155,7 +156,7 @@ map <Leader>d] :call DiffContrast('higher')<CR>
 map <Leader>d[ :call DiffContrast('lower')<CR>
 map <Leader>l :call Numbers()<CR>
 map <Leader>j :GitGutterToggle<CR>
-nmap <Leader>h :brow old<CR>
+nmap <Leader>h :fzf#vim#history()<CR>
 
 set laststatus=2
 set background=dark
@@ -477,5 +478,4 @@ call SourceIfExists("~/.vimrc.local")
 "XXX use @linux only
 "let g:NERDTreeDirArrowExpandable = '+'
 "let g:NERDTreeDirArrowCollapsible = 'v'
-let g:ctrlp_working_path_mode = 'c'
-
+"let g:ctrlp_working_path_mode = 'c'
