@@ -12,6 +12,9 @@ Plugin 'jlanzarotta/bufexplorer'
 "Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
 Plugin 'neoclide/coc.nvim'
+
+Plugin 'davidhalter/jedi-vim'
+
 "Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
@@ -20,10 +23,17 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'gregsexton/gitv'
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
+Plugin 'junegunn/vim-peekaboo'
+Plugin 'fatih/vim-go'
+"Plugin 'maralla/completor.vim'
+Plugin 'puremourning/vimspector'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
+"
 "XXX: fix dup
+"autocmd BufWinEnter *.py nmap <silent> <F9>:w<CR>:terminal python3 -m pdb '%:p'<CR>
+
 command! -bang -complete=dir -nargs=? FZFindPath
     \ call fzf#run(fzf#wrap({'dir': <q-args>}, <bang>0))
 command! -bang -complete=dir -nargs=? FZFindPathQ
@@ -48,6 +58,14 @@ set nofoldenable
 set encoding=utf-8
 let g:ycm_server_python_interpreter='/usr/bin/python'
 
+nnoremap <silent> <Leader>= :exe "resize " . (winheight(0) * 3/2)<CR>
+nnoremap <silent> <Leader>] :exe "vertical resize " . (winwidth(0) * 3/2)<CR>
+nnoremap <silent> <Leader>- :exe "resize " . (winheight(0) * 2/3)<CR>
+nnoremap <silent> <Leader>[ :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
+
+noremap <Leader>r :let @t=@0<CR>"rdiw"tP
+
+noremap <Leader>c :call ToggleCursorHighlight()<CR>
 noremap gF :e <cfile><cr>
 map <Leader>qq :call ToggleHex()<CR>
 map <Leader>qr mp:%!xxd -r\|xxd<CR>`p
@@ -70,6 +88,7 @@ let g:grep_mode='auto'
 let g:ext_groups = {'cpp': ['c','h','cpp','hpp','inl','cu'], 'cmake': ['cmake','txt'], 'py': ['py'], 'js': ['js', 'jsx', 'json', 'coffee']}
 
 map // "sy/<C-R>s<CR>
+map gn :let @a = substitute(expand("%"), '.*\/', '', '')<cr>
 map gp :let @/ = substitute(expand("%"), '.*\/', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
 map gP :let @/ = substitute(substitute(expand("%"), '.*\/', '', ''), '\..*', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
 map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
@@ -79,6 +98,19 @@ map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
 map gb :call SetGrep()<CR>:grep! "<C-R>/"<CR>:cw<CR>
 map gm :call NextGrepMode()<CR>
 nmap <leader>b :let @t=@/<CR>?^```?es<CR>l"iy$j^mt/^```/<CR>kmb``:let @/=@t<CR>:'t,'bw !<C-R>i<CR>
+
+function! ToggleCursorHighlight()
+    let b:cursor_highlight = get(b:, 'cursor_highlight', 0)
+    if b:cursor_highlight
+        execute(':set nocursorcolumn')
+        execute(':set nocursorline')
+        let b:cursor_highlight = 0
+    else
+        execute(':set cursorcolumn')
+        execute(':set cursorline')
+        let b:cursor_highlight = 1
+    endif
+endfunction
 
 "XXX: clean it
 function! ToggleHex()
@@ -479,3 +511,61 @@ call SourceIfExists("~/.vimrc.local")
 "let g:NERDTreeDirArrowExpandable = '+'
 "let g:NERDTreeDirArrowCollapsible = 'v'
 "let g:ctrlp_working_path_mode = 'c'
+au FileType go nmap <leader>r <Plug>(go-run)
+au FileType go nmap <leader>b <Plug>(go-build)
+au FileType go nmap <leader>t <Plug>(go-test)
+au FileType go nmap <leader>c <Plug>(go-coverage-toggle)
+au FileType go nmap <Leader>e <Plug>(go-rename)
+au FileType go nmap <Leader>s <Plug>(go-implements)
+au FileType go nmap <Leader>i <Plug>(go-info)
+let g:go_fmt_command = "goimports"
+let g:go_auto_sameids = 0
+
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_generate_tags = 1
+
+
+let g:vimspector_adapters = #{
+      \   test_debugpy: #{ extends: 'debugpy' }
+      \ }
+
+let g:vimspector_configurations = {
+          \ "test_debugpy_config": {
+          \   "adapter": "test_debugpy",
+      \   "filetypes": [ "python" ],
+      \   "configuration": {
+          \     "request": "launch",
+      \     "type": "python",
+      \     "cwd": "${fileDirname}",
+      \     "args": [],
+      \     "program": "${file}",
+      \     "stopOnEntry": v:false,
+      \     "console": "integratedTerminal",
+      \     "integer": 123,
+      \   },
+      \   "breakpoints": {
+          \     "exception": {
+          \       "raised": "N",
+      \       "uncaught": "",
+      \       "userUnhandled": ""
+      \     }
+      \   }
+      \ } }
+
+nmap <Leader>ds :call vimspector#Stop()<CR>
+nmap <F9> :call vimspector#ToggleBreakpoint()<CR>
+nmap <Leader>dc <Plug>VimspectorToggleConditionalBreakpoint
+nmap <F5> :call vimspector#Continue()<CR>
+nmap <F2> :call vimspector#Restart()<CR>
+nmap <Leader>dr :call vimspector#RunToCursor()<CR>
+nmap <F6> :call vimspector#StepInto()<CR>
+nmap <F7> :call vimspector#StepOver()<CR>
+nmap <Leader><F7> :call vimspector#StepOut()<CR>
+nmap <Leader>de <Plug>VimspectorBalloonEval
+nmap <Leader>db <Plug>VimspectorBreakpoints
