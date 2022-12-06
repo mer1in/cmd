@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function usage(){
+    echo "`basename $0` profile <cmds>"
+    echo "  profiles:"
+    cat $0|grep '$PROFILE' | grep -v  '#THIS#' |sed 's/.*PROFILE == "\([^"]*\)".*/\1/' 
+    exit 1
+}
+
+
+[[ $1 ]] || usage
+PROFILE=$1
+[[ $PROFILE == "local" ]] && { HOST='http://localhost/'; CREDS="butler:butler"; echo local >~/.j.profile; }
+[ -z $HOST ] && {
+    $0 `cat ~/.j.profile` $@
+    exit $?
+}
+shift
+
+#specials
+if [[ $1 == "lsb" ]] 
+then
+    curl --user $CREDS  "$HOST/job/$2/api/json?tree=allBuilds\[result,number,displayName\]"
+    exit $?
+fi
+
+java -jar ~/jenkins-cli.jar -s $HOST -webSocket -auth $CREDS $@
+

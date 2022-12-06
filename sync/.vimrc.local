@@ -1,0 +1,100 @@
+" daily func
+
+function! Daily()
+python3 << EOF
+import vim, re
+from datetime import date
+(row, col) = vim.current.window.cursor
+buf = vim.current.buffer
+line = buf[row-1]
+print("line: "+line)
+if (list(filter(None, line.split()))[0]=="new"):
+    tasks = []
+    c = row
+    while (not re.match("^\d{2}\.\d{2}\.\d{4}$", buf[c])):
+        if (not buf[c].strip()):
+            del buf[c]
+        else:
+            c = c+1
+    c = c+1
+    while (buf[c].strip()):
+        l = buf[c]
+        if (re.search('^[\*\-\?b]', l.strip())):
+            tasks.append(re.split('\n', re.split(' =[^ ]+',l)[0])[0]+'\n')
+        c = c+1
+    tasks.append('')
+    tasks.reverse()
+    buf[row-1] = date.today().strftime('%d.%m.%Y')
+    for task in tasks:
+        buf.append(task, row)
+EOF
+endfunction
+nmap <C-@> :call Daily()<CR>
+
+function! Unique()
+python3 << UNIQUE_EOF
+import vim, re
+buf = vim.current.buffer
+i = 0
+lines = {}
+found = 0
+while (i<len(buf)):
+    s = buf[i]
+    if (not s in lines):
+        found += 1
+        lines[s] = found
+    i += 1
+new_buf = ['']*len(lines)
+for line, num in lines.items():
+    new_buf[num-1] = line
+buf[:] =  new_buf
+UNIQUE_EOF
+endfunction
+nmap <C-f> :g!//d<CR>:call Unique()<CR>
+
+function! ChromeSearch(engine)
+python3 << EOF
+import vim, subprocess
+buf = vim.current.buffer
+(lnum1, col1) = buf.mark('<')
+(lnum2, col2) = buf.mark('>')
+lines = vim.eval('getline({}, {})'.format(lnum1, lnum2))
+lines[0] = lines[0][col1:]
+lines[-1] = lines[-1][:col2]
+
+engine = vim.eval("a:engine")
+url = 'https://www.google.com/search?q='
+space = '+'
+if ('stackoverflow' == engine):
+    url = 'https://stackoverflow.com/search?q='
+if ('reddit' == engine):
+    url = 'https://www.reddit.com/search/?q='
+    space = '%20'
+
+text = "\n".join(lines).replace(' ', space)
+
+subprocess.run(['open', '-a', 'Google Chrome', url+text])
+EOF
+endfunction
+map <Leader>sg :call ChromeSearch('google')<CR>
+map <Leader>ss :call ChromeSearch('stackoverflow')<CR>
+map <Leader>sr :call ChromeSearch('reddit')<CR>
+
+function! OpenUrl()
+python3 << EOF
+import vim, subprocess
+(row, col) = vim.current.window.cursor
+buf = vim.current.buffer
+line = buf[row-1]
+left = right = col
+while (left>=0 and not line[left] in [' ', "'", '"', '`', '[']):
+    left -= 1
+left += 1
+while (right<len(line) and not line[right] in [' ', "'", '"', '`', ']']):
+    right += 1
+#print(f'"{line[left:right]}"')
+subprocess.run(['open', '-a', 'Google Chrome', line[left:right]])
+EOF
+endfunction
+map gu :call OpenUrl()<CR>
+source ~/.vaultvar.vimrc
