@@ -1,0 +1,11 @@
+#!/bin/bash
+
+STR=$1
+COUNT=$2
+[ -z $COUNT ] && COUNT=20
+i=0
+while (( i++ < $COUNT ))
+do
+    res="$res$STR"
+done
+echo $res

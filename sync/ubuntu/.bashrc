@@ -176,7 +176,7 @@ bind '"\C-g-": "\C-ex\C-u git co -\C-m\C-y\C-b\C-d"'
 bind '"\C-gm": "\C-ex\C-u git merge --squash `git name-rev $(git rev-parse @{-1}) --name-only`\C-m\C-y\C-b\C-d"'
 #_V_UTILS_END_
 
-export FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info --preview='[[ \$(file --mime {}) =~ binary ]] && echo {} is a binary file || (PF={}; PF=\${PF/#\~/$HOME}; batcat --style=numbers --color=always \$PF) 2>/dev/null | head -300' --preview-window='right' --bind='f3:execute(PF={}; PF=\${PF/#\~/$HOME}; batcat --style=numbers \$PF),f2:toggle-preview,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-a:select-all+accept,ctrl-y:execute-silent(echo {+}|pbcopy)'"
+export FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info --preview='[[ \$(file --mime {}) =~ binary ]] && echo {} is a binary file || (PF={}; PF=\${PF/#\~/$HOME}; batcat --style=numbers --color=always \$PF) 2>/dev/null | head -300' --preview-window='right' --bind='f3:execute(PF={}; PF=\${PF/#\~/$HOME}; batcat --style=numbers \$PF),f2:toggle-preview,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-a:select-all+accept,ctrl-y:execute-silent(echo {+}|clip.exe)'"
 alias l='ls -G'
 alias ls='ls -G'
 alias ll='ls -Gal'
@@ -200,6 +200,7 @@ enter_ssh_host(){
 run_ssh(){
     S_SSH_HOSTS=~/.ssh-hosts
     [ -f $S_SSH_HOSTS ] || touch $S_SSH_HOSTS
+    FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info --bind='ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-y:execute-silent(echo {+}|clip.exe)'"
     SELECTION=`cat $S_SSH_HOSTS | fzf --print-query +m`
     HOST=`echo $SELECTION|sed 's/.* //'`
     [ -n "$HOST" ] || return
@@ -212,7 +213,8 @@ run_ssh(){
 #        tmux new-window -n "ssh $HOST" "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $HOST" || \\
 
 }
-bind '"\C-ns": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
+bind '"\C-kk": kill-line'
+
 bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 alias k=kubectl
 complete -o default -F __start_kubectl k
@@ -221,10 +223,12 @@ pods() {
   FZF_DEFAULT_COMMAND="kubectl get pods --all-namespaces" \
     fzf --info=inline --layout=reverse --header-lines=1 --height=100\
         --prompt "$(kubectl config current-context | sed 's/-context$//')> " \
-        --header $'╱ Enter (kubectl exec) ╱ CTRL-O (open log in editor) ╱ CTRL-R (reload) ╱ CTRL-D (describe) /\n\n' \
+        --header $'╱ Enter (exec) ╱ (L)og ╱ (P)revious logs ╱ (R)eload ╱ (D)escribe / (E)edit\n\n' \
         --bind 'ctrl-/:change-preview-window(80%,border-bottom|hidden|)' \
-        --bind 'enter:execute:kubectl exec -it --namespace {1} {2} -- bash > /dev/tty' \
-        --bind 'ctrl-o:execute:${EDITOR:-vim} <(kubectl logs --all-containers --namespace {1} {2}) > /dev/tty' \
+        --bind 'enter:execute:kubectl exec -it --namespace {1} {2} -- sh > /dev/tty' \
+        --bind 'ctrl-l:execute:${EDITOR:-vim} <(kubectl logs --all-containers --namespace {1} {2}) > /dev/tty' \
+        --bind 'ctrl-p:execute:${EDITOR:-vim} <(kubectl logs -p --namespace {1} {2}) > /dev/tty' \
+        --bind 'ctrl-e:execute:EDITOR=vim kubectl edit --namespace {1} pod {2}' \
         --bind 'ctrl-d:execute:batcat --paging=always <(kubectl describe --namespace {1} pod/{2}) > /dev/tty' \
         --bind 'ctrl-r:reload:$FZF_DEFAULT_COMMAND' \
         --bind 'ctrl-s:reload:$FZF_SVC_COMMAND' \
@@ -233,6 +237,7 @@ pods() {
 }
 
 bind '"\C-np": "\C-ex\C-u pods\C-m\C-y\C-b\C-d"'
+bind '"\C-kp": "\C-ex\C-u pods\C-m\C-y\C-b\C-d"'
 choose_kubeconfig(){
 (
     cd ~/.kube/configs/
@@ -262,15 +267,13 @@ choose_kubeconfig(){
     fi
 ) }
 bind '"\C-nc": "\C-ex\C-u choose_kubeconfig\C-m\C-y\C-b\C-d"'
+bind '"\C-kc": "\C-ex\C-u choose_kubeconfig\C-m\C-y\C-b\C-d"'
 
 genpass(){
     local len=$1
     [ -z $len ] && len=12
     dd if=/dev/urandom count=1 2> /dev/null | uuencode -m - | sed -ne 2p | cut -c-$len
 }
-
-# call thefuck with ctrl+gf
-#bind '"\C-gf": "` python3 ~/.tf/stf.py $(history 1 | head -n 1 | cut -c 8-) | fzf +m`"'
 __fuck__(){
     local cmd='command python3 ~/.tf/stf.py $(history 1 | head -n 1 | cut -c 8-)'
 	local opts="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore --reverse ${FZF_DEFAULT_OPTS-} ${FZF_CTRL_T_OPTS-} +m"
@@ -288,4 +291,26 @@ fuck-widget(){
   READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
   READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
+__cdswd(){
+    [ -d ~/.cds ] || return
+    for a in $(ls ~/.cds/|grep -v config)
+    do 
+        echo "$a = $(cat ~/.cds/$a)"
+    done|fzf +m -e --bind 'ctrl-w:become(echo {}|sed "s#^. = ##")'
+}
+cdswd-widget(){
+  local selected="$(__cdswd "$@")"
+  local cleaned="`echo $selected|sed 's/^. = //'`"
+  # if selected starts with '. = ', enter was hit, otherwise it was ctrl+w
+  if [[ $selected == $cleaned ]]
+  then
+      READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+      READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+  else
+      cd $cleaned
+      printf "${__GREY_ON_GREEN}`pwd`\n"
+  fi
+}
 bind -m emacs-standard -x '"\C-gf": fuck-widget'
+bind -m emacs-standard -x '"\C-gu": cdswd-widget'
+
