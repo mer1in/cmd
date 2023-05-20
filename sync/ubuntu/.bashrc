@@ -124,7 +124,7 @@ for a in {a..z} ; do alias "cd$a=[[ -d ~/.cds && -f ~/.cds/$a ]] && cd \`cat ~/.
 alias cdr='cd $(~/.v.utils/cdr)'
 alias cdswd='[ -d ~/.cds ] && d="`for a in $(ls ~/.cds/|grep -v config); do echo \"$a = $(cat ~/.cds/$a)\"; done|fzf +m -e`" && { [ -z "$d" ] || cd $(echo $d|sed "s/^. = //") ; }'
 alias sdr='echo "r is reserved for git root"'
-bind '"\C-gd": "\C-ex\C-u cdswd\C-m\C-y\C-b\C-d"'
+#bind '"\C-gd": "\C-ex\C-u cdswd\C-m\C-y\C-b\C-d"'
 
 # wsl conf expected format: [ { "prefix": "/mnt/c", "drive": "c:" }, {...} ]
 CF=~/.cds/config.json; [ -f $CF ] && export WINDOWS_PREFIXES=`cat $CF |jq -r '.[] | .prefix'`
@@ -312,5 +312,5 @@ cdswd-widget(){
   fi
 }
 bind -m emacs-standard -x '"\C-gf": fuck-widget'
-bind -m emacs-standard -x '"\C-gu": cdswd-widget'
+bind -m emacs-standard -x '"\C-gd": cdswd-widget'
 
