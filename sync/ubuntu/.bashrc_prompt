@@ -35,10 +35,12 @@ GREEN_ON_GREY 28 248 BOLD
 RED_ON_GREY 160 248 BOLD
 COLORS
 RST="\[\033[0m\]"
+__RST="\033[0m"
 
-function color_my_prompt {
-  local EXIT="$?"
-  local __git_branch_color="$DK_GREEN_ON_YELLOW"
+get_git_status(){
+  local __git_branch_color="$__DK_GREEN_ON_YELLOW"
+  local GOY=${GREEN_ON_YELLOW}
+  local YON=${YELLOW_ON_NONE}
   GIT_PS1_SHOWDIRTYSTATE=true
   GIT_PS1_SHOWUNTRACKEDFILES=true
   WINPATH=""
@@ -48,22 +50,40 @@ function color_my_prompt {
 
   # colour branch name depending on state
   if [[ "${__git_branch}" =~ "*" ]]; then     # if repository is dirty
-      __git_branch_color="$RED_ON_YELLOW"
+      __git_branch_color="$__RED_ON_YELLOW"
   elif [[ "${__git_branch}" =~ "$" ]]; then   # if there is something stashed
-      __git_branch_color="$BROWN_ON_YELLOW"
+      __git_branch_color="$__BROWN_ON_YELLOW"
   elif [[ "${__git_branch}" =~ "%" ]]; then   # if there are only untracked files
-      __git_branch_color="$LT_GREY_ON_YELLOW"
+      __git_branch_color="$__LT_GREY_ON_YELLOW"
   elif [[ "${__git_branch}" =~ "+" ]]; then   # if there are staged files
-      __git_branch_color="$CYAN_ON_YELLOW"
+      __git_branch_color="$__CYAN_ON_YELLOW"
+  fi
+
+  if [[ "$1" == "clean-colors" ]]
+  then
+    GOY=${__GREEN_ON_YELLOW}
+    YON=${__YELLOW_ON_NONE}
+    __git_branch=`echo ${__git_branch}|sed 's/ .*//'`
+  else
+    GOY="${GOY}"
+    __git_branch_color="\[\033[0m${__git_branch_color}\]"
   fi
 
   if [ -n "$__git_branch" ] ; then
       SYMB='➦'
       [[ ${__git_branch/.../} == $__git_branch ]] && SYMB=''
-      GIT_STATUS="${GREEN_ON_YELLOW}${__git_branch_color} $SYMB ${__git_branch} ${YELLOW_ON_NONE}"
+      GIT_STATUS="${GOY}${__git_branch_color} $SYMB ${__git_branch} ${YON}"
   else
-      GIT_STATUS="${GREEN_ON_NONE}"
+      GIT_STATUS=
   fi
+  echo $GIT_STATUS
+}
+
+function color_my_prompt {
+  local EXIT="$?"
+
+  GIT_STATUS=`get_git_status`
+  [ -z "$GIT_STATUS" ] && GIT_STATUS="${GREEN_ON_NONE}"
 
   BG_JOBS=""
   (( $(jobs -l | wc -l) )) && BG_JOBS="${BLUE_ON_GREY}⏳ "

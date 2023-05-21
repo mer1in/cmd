@@ -223,7 +223,7 @@ pods() {
   FZF_DEFAULT_COMMAND="kubectl get pods --all-namespaces" \
     fzf --info=inline --layout=reverse --header-lines=1 --height=100\
         --prompt "$(kubectl config current-context | sed 's/-context$//')> " \
-        --header $'╱ Enter (exec) ╱ (L)og ╱ (P)revious logs ╱ (R)eload ╱ (D)escribe / (E)edit\n\n' \
+        --header $'╱ Enter (exec) ╱ (L)og ╱ (P)revious logs ╱ (R)eload ╱ (D)escribe ╱ (E)edit\n\n' \
         --bind 'ctrl-/:change-preview-window(80%,border-bottom|hidden|)' \
         --bind 'enter:execute:kubectl exec -it --namespace {1} {2} -- sh > /dev/tty' \
         --bind 'ctrl-l:execute:${EDITOR:-vim} <(kubectl logs --all-containers --namespace {1} {2}) > /dev/tty' \
@@ -296,7 +296,15 @@ __cdswd(){
     for a in $(ls ~/.cds/|grep -v config)
     do 
         echo "$a = $(cat ~/.cds/$a)"
-    done|fzf +m -e --bind 'ctrl-w:become(echo {}|sed "s#^. = ##")'
+    done|fzf +m -e \
+        --bind 'ctrl-a:become(echo {}|sed "s#^. = ##")' \
+        --preview='d=`echo {}|sed "s#^. = ##"`; \
+            . ~/.bashrc 2>/dev/null ; \
+            printf "${__GREY_ON_GREEN}`basename $d`${__RST}\n"; \
+            gs=`cd $d; get_git_status clean-colors`; [ -n "$gs" ] \
+                && printf "$gs${__RST}\n"; \
+            echo; ls -l --color $d'  \
+        --header $'╱ Enter (cd selection) ╱ (A)dd selection to command line \n\n'
 }
 cdswd-widget(){
   local selected="$(__cdswd "$@")"
