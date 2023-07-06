@@ -8,12 +8,13 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 "Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'scrooloose/nerdtree'
-Plugin 'jlanzarotta/bufexplorer'
+"Plugin 'jlanzarotta/bufexplorer'
 "Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
 Plugin 'neoclide/coc.nvim'
 
 Plugin 'davidhalter/jedi-vim'
+Plugin 'supertab'
 
 "Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
@@ -28,6 +29,9 @@ Plugin 'fatih/vim-go'
 "Plugin 'maralla/completor.vim'
 Plugin 'puremourning/vimspector'
 Plugin 'tpope/vim-surround'
+Plugin 'iamcco/markdown-preview.nvim'
+"Plugin 'pangloss/vim-javascript'
+
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -35,8 +39,27 @@ filetype plugin indent on    " required
 let &t_SI .= "\<Esc>[4 q"
 let &t_EI .= "\<Esc>[2 q"
 
+
+nmap <space>wp i<C-R>=substitute(system('powershell.exe Get-Clipboard\|cat'),'[\r\n]*$','','')<CR><ESC>
+vmap <space>wy "9y:call system('clip.exe', @9)<CR>
+
+inoremap jj <Esc>
+nnoremap Q <nop>
+inoremap <C-h> <Left>
+inoremap <C-j> <C-o>gj
+inoremap <C-k> <C-o>gk
+inoremap <C-l> <Right>
+nnoremap <C-k> <C-w>k
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+nnoremap <C-j> <C-w>j
+autocmd VimResized * wincmd =
+
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+nnoremap <space>i :read !save-img-from-clipboard.sh<cr>
+
 
 "
 "XXX: fix dup
@@ -70,6 +93,7 @@ nnoremap <silent> <Leader>= :exe "resize " . (winheight(0) * 3/2)<CR>
 nnoremap <silent> <Leader>] :exe "vertical resize " . (winwidth(0) * 3/2)<CR>
 nnoremap <silent> <Leader>- :exe "resize " . (winheight(0) * 2/3)<CR>
 nnoremap <silent> <Leader>[ :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
+nnoremap <silent> <Leader>be :Buffers!<CR>
 
 noremap <Leader>r :let @t=@0<CR>"rdiw"tP
 
@@ -82,7 +106,8 @@ map <Leader>p :FZFindPath<CR>
 map <C-P> :FZFindPath<CR>
 map <Leader>P :call FZFindGitRoot()<CR>
 
-map <Leader>e :%s/<C-R>//<C-R><C-w>/g<CR>
+nmap <Leader>e :%s/<C-R>//<C-R><C-w>/g<CR>
+vmap <Leader>e m9"9y:%s/<C-R>//<C-R>9/g<CR>`9gv
 
 map <Tab> ]c
 map <S-Tab> [c
@@ -95,13 +120,22 @@ map <C-N> :NERDTreeToggle<CR>
 let g:grep_mode='auto'
 let g:ext_groups = {'cpp': ['c','h','cpp','hpp','inl','cu'], 'cmake': ['cmake','txt'], 'py': ['py'], 'js': ['js', 'jsx', 'json', 'coffee']}
 
-map // "sy/<C-R>s<CR>
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 map gn :let @a = substitute(expand("%"), '.*\/', '', '')<cr>
 map gp :let @/ = substitute(expand("%"), '.*\/', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
 map gP :let @/ = substitute(substitute(expand("%"), '.*\/', '', ''), '\..*', '', '')<cr>:grep! "<C-R>/"<cr>:cw<cr>
 map gw "syiw/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! '\<<cword>\>'<CR>:cw<CR>
 map gt :FZFindPathQ<CR>
 map gT :call FZFindGitRootQ()<CR>
+nnoremap t1 1gt
+nnoremap t2 2gt
+nnoremap t3 3gt
+nnoremap t4 4gt
+nnoremap t5 5gt
+nnoremap t6 6gt
+nnoremap t7 7gt
+nnoremap t8 8gt
+nnoremap t9 9gt
 map gs "sy/<C-R>s<CR>?<CR>:call SetGrep()<CR>:grep! "<C-R>s"<CR>:cw<CR>
 map gb :call SetGrep()<CR>:grep! "<C-R>/"<CR>:cw<CR>
 map gm :call NextGrepMode()<CR>
@@ -109,6 +143,7 @@ nmap <leader>b :let @t=@/<CR>?^```?es<CR>l"iy$j^mt/^```/<CR>kmb``:let @/=@t<CR>:
 
 function! ToggleCursorHighlight()
     let b:cursor_highlight = get(b:, 'cursor_highlight', 0)
+    let b:color_column = get(b:, 'color_column', 0)
     if b:cursor_highlight
         execute(':set nocursorcolumn')
         execute(':set nocursorline')
@@ -117,6 +152,14 @@ function! ToggleCursorHighlight()
         execute(':set cursorcolumn')
         execute(':set cursorline')
         let b:cursor_highlight = 1
+        if b:color_column
+            execute(':set colorcolumn=80')
+            execute(':highlight ColorColumn ctermbg=green guibg=green')
+            let b:color_column = 0
+        else
+            execute(':set colorcolumn=')
+            let b:color_column = 1
+        endif
     endif
 endfunction
 
@@ -232,6 +275,7 @@ function! Numbers()
         exec(':set rnu')
     endif
 endfunction
+call Numbers()
 
 function! DiffContrast(dir)
     let g:solarized_diffmode = get(g:, 'solarized_diffmode', 'normal')
@@ -417,6 +461,25 @@ function! SourceIfExists(file)
   endif
 endfunction
 
+
+" chatgpt integration, wip
+function! ChatGPT()
+python3 << EOF
+import sys, os
+sys.path.append(f"{os.environ['HOME']}/.local/bin/vim-chatGPT")
+assert(os.path.isfile(f"{os.environ['HOME']}/.local/bin/vim-chatGPT/vim_chat_GPT.py"))
+from vim_chat_GPT import get_comment_at_cursor, process
+
+comment, position = get_comment_at_cursor()
+open('/tmp/comment.txt', 'w').write(comment)
+result = process(comment)
+write_result(result, position)
+
+EOF
+endfunction
+nmap <space>c :call ChatGPT()<cr>
+
+
 function! Daily()
 python3 << EOF
 import vim, re
@@ -578,7 +641,25 @@ nmap <Leader><F7> :call vimspector#StepOut()<CR>
 nmap <Leader>de <Plug>VimspectorBalloonEval
 nmap <Leader>db <Plug>VimspectorBreakpoints
 
-nnoremap <Leader>tn :tabnew<CR>
-nnoremap <Leader>tc :tabclose<CR>
-nnoremap <Leader>tC :tabclose!<CR>
+nnoremap <C-c> :noh<CR>:redraw!<CR>
+nmap <space>w ciw""<esc>P
+vmap <space>w xi"<esc>pa"<esc>
+
+nnoremap <space>gp :w<bar>:Gwrite<bar>Git commit -m "WIP <c-r>%"<bar>Git push<cr>
+nnoremap <space>ga :w<bar>:Gwrite<cr>
+nnoremap <space>gg :w<bar>:G<cr>
+nnoremap <space>gc :w<bar>:Gwrite<cr>:Git commit<cr>
+nnoremap <space>gb :Git blame<cr>
+nnoremap <space>gl :call FileGitLog(expand(@%))<CR>
+
+nnoremap tn :tabnew<CR>
+nnoremap tc :tabclose<CR>
+nnoremap tt :tabNext<CR>
+nnoremap tC :tabclose!<CR>
+au User FugitiveIndex nmap <buffer> dt :Gtabedit <Plug><cfile><Bar>Gdiffsplit<CR>
+
+noremap <Leader>bc :History:<cr>
+noremap <Space>: :History:<cr>
+noremap <Leader>bf :History/<cr>
+noremap <Space>/ :History/<cr>
 
