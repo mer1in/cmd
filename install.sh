@@ -60,6 +60,10 @@ export FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-i
 #_V_UTILS_END_
 EOM
 cp ./bashrc_prompt ~/.bashrc_prompt
+if [ $OS = Linux ]
+then
+    cat ./sync/ubuntu/.vimrc > ~/.vimrc
+fi
 ~/.v.utils/v --up
 
 (cd ~/.vim/bundle/coc.nvim && yarn install)
