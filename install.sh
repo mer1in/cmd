@@ -16,7 +16,7 @@ else
     [ -f ~/.bashrc ] && sed -i '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
     curl -V > /dev/null || sudo apt-get install -y curl
     #install nodejs on Ubuntu
-    nodejs -v > /dev/null || { \
+    node -v > /dev/null || { \
         curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - ; \
         sudo apt-get -y update; \
         sudo apt-get install -y nodejs; \
