@@ -15,7 +15,6 @@ Plugin 'neoclide/coc.nvim'
 
 Plugin 'davidhalter/jedi-vim'
 
-"Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'vim-airline/vim-airline'
