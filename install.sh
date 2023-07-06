@@ -18,6 +18,7 @@ else
     #install nodejs on Ubuntu
     nodejs -v > /dev/null || { \
         curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - ; \
+        sudo apt-get -y update; \
         sudo apt -y install nodejs; \
     }
     npm -v || sudo apt -y install npm
