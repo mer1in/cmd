@@ -19,7 +19,7 @@ else
     nodejs -v > /dev/null || { \
         curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - ; \
         sudo apt-get -y update; \
-        sudo apt -y install nodejs; \
+        sudo apt-get install -y nodejs; \
     }
     npm -v || sudo apt -y install npm
     yarn -v || sudo npm install --global yarn
