@@ -20,7 +20,7 @@ else
         curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - ; \
         sudo apt -y install nodejs; \
     }
-    
+    npm -v || sudo apt -y install npm
 fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
