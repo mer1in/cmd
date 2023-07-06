@@ -14,6 +14,12 @@ else
     EXTENDED_REGEXP_KEY=r
     VRC_EXCLUDE=XXXXXXX
     [ -f ~/.bashrc ] && sed -i '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
+    #install nodejs on Ubuntu
+    nodejs -v > /dev/null || { \
+        curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - ; \
+        sudo apt -y install nodejs; \
+    }
+    
 fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
