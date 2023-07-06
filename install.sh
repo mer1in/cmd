@@ -61,3 +61,4 @@ EOM
 cp ./bashrc_prompt ~/.bashrc_prompt
 ~/.v.utils/v --up
 
+(cd ~/.vim/bundle/coc.nvim && yarn install)
