@@ -62,7 +62,10 @@ EOM
 cp ./bashrc_prompt ~/.bashrc_prompt
 if [ $OS = Linux ]
 then
-    cat ./sync/ubuntu/.vimrc > ~/.vimrc
+    for f in .vimrc .bashrc .bashrc_prompt .tmux.conf
+    do
+        cat ./sync/ubuntu/$f > ~/$f
+    done
 fi
 ~/.v.utils/v --up
 
