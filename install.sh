@@ -21,7 +21,7 @@ else
         sudo apt -y install nodejs; \
     }
     npm -v || sudo apt -y install npm
-    yarn -v || npm install --global yarn
+    yarn -v || sudo npm install --global yarn
 fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
