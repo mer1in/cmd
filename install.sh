@@ -61,6 +61,13 @@ export FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-i
 #_V_UTILS_END_
 EOM
 cp ./bashrc_prompt ~/.bashrc_prompt
+
+git config --global alias.co checkout
+git config --global alias.s status
+git config --global alias.br "branch --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(contents:subject) %(color:green)(%(committerdate:relative)) [%(authorname)]' --sort=-committerdate"
+git config --global alias.ll '!git log --pretty=format:"%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) [%an]" --abbrev-commit'
+git config --global alias.lg '!git log --oneline --decorate --graph'
+
 if [ $OS = Linux ]
 then
     for f in .vimrc .bashrc .bashrc_prompt .tmux.conf
