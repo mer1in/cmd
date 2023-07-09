@@ -23,6 +23,7 @@ else
     }
     npm -v || sudo apt -y install npm
     yarn -v || sudo npm install --global yarn
+    fzf --version || sudo apt -y install fzf
 fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
