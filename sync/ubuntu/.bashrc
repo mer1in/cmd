@@ -131,7 +131,7 @@ CF=~/.cds/config.json; [ -f $CF ] && export WINDOWS_PREFIXES=`cat $CF |jq -r '.[
 
 alias gut=git
 bind '"\C-gp": "\C-ex\C-u git push || git pull -r && git push\C-m\C-y\C-b\C-d"'
-bind '"\C-gg": "\C-ex\C-u git pull -r\C-m\C-y\C-b\C-d"'
+bind '"\C-gg": "\C-ex\C-u git remote update origin --prune ; git pull -r\C-m\C-y\C-b\C-d"'
 function git_hist_file(){
     rev=$1
     PROMPT=$(git ll -1 --color=always $rev)
@@ -201,21 +201,20 @@ run_ssh(){
     S_SSH_HOSTS=~/.ssh-hosts
     [ -f $S_SSH_HOSTS ] || touch $S_SSH_HOSTS
     FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info --bind='ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-y:execute-silent(echo {+}|clip.exe)'"
-    SELECTION=`cat $S_SSH_HOSTS | fzf --print-query +m`
+    SELECTION=`cat $S_SSH_HOSTS | grep -v '^ *#' | fzf --print-query +m \
+        --bind 'ctrl-w:become(echo "#{}")' \
+        --header $'╱ Enter (ssh selection) ╱ (W)rite selection to command line \n\n'`
+    [[ "${SELECTION:0:1}" == "#" ]] && echo ${SELECTION:1}|sed "s/'//g" && return 
     HOST=`echo $SELECTION|sed 's/.* //'`
     [ -n "$HOST" ] || return
     [ -z "`cat $S_SSH_HOSTS|grep $HOST`" ] && echo $HOST >> $S_SSH_HOSTS
     [ -n "$TMUX" ]  && \
         tmux new-window -n "ssh $HOST" ". ~/.bashrc 2>/dev/null ; enter_ssh_host $HOST" || \
         enter_ssh_host $HOST
-#        ssh -Y -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $HOST
-
-#        tmux new-window -n "ssh $HOST" "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $HOST" || \\
-
 }
+
 bind '"\C-kk": kill-line'
 
-bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 alias k=kubectl
 complete -o default -F __start_kubectl k
 pods() {
@@ -223,12 +222,13 @@ pods() {
   FZF_DEFAULT_COMMAND="kubectl get pods --all-namespaces" \
     fzf --info=inline --layout=reverse --header-lines=1 --height=100\
         --prompt "$(kubectl config current-context | sed 's/-context$//')> " \
-        --header $'╱ Enter (exec) ╱ (L)og ╱ (P)revious logs ╱ (R)eload ╱ (D)escribe ╱ (E)edit\n\n' \
+        --header $'╱ Enter (exec) ╱ (L)og ╱ (P)rev logs ╱ (R)eload ╱ (D)escribe ╱ (E)dit ╱ (K)ill ╱ \n\n' \
         --bind 'ctrl-/:change-preview-window(80%,border-bottom|hidden|)' \
         --bind 'enter:execute:kubectl exec -it --namespace {1} {2} -- sh > /dev/tty' \
         --bind 'ctrl-l:execute:${EDITOR:-vim} <(kubectl logs --all-containers --namespace {1} {2}) > /dev/tty' \
         --bind 'ctrl-p:execute:${EDITOR:-vim} <(kubectl logs -p --namespace {1} {2}) > /dev/tty' \
         --bind 'ctrl-e:execute:EDITOR=vim kubectl edit --namespace {1} pod {2}' \
+        --bind 'ctrl-k:execute:kubectl delete -n {1} pod {2}' \
         --bind 'ctrl-d:execute:batcat --paging=always <(kubectl describe --namespace {1} pod/{2}) > /dev/tty' \
         --bind 'ctrl-r:reload:$FZF_DEFAULT_COMMAND' \
         --bind 'ctrl-s:reload:$FZF_SVC_COMMAND' \
@@ -255,10 +255,10 @@ choose_kubeconfig(){
         then
             NKCTX="`kubectl config --kubeconfig=$NKC get-contexts | grep -v NAMESPACE | fzf +m --prompt $NKC \
                 --preview-window left \
-                --preview '. ~/.bashrc; '\
-'ls | awk -v fnam="'$NKC'" '"'"'{ if($1==fnam){ printf("%c[1;32m%s%c[1;0m\n", 27, $0, 27) } else { print } }'"'; rep = 40 ; echo {}; "\
+                --preview '. ~/.bashrc 2>/dev/null ; '\
+'ls | awk -v fnam="'$NKC'" '"'"'{ if($1==fnam){ printf("%c[1;32m%s%c[1;0m\n", 27, $0, 27) } else { print } }'"'; "\
 'C=$(echo {}|awk '"'"'{if($1=="*"){print $3}else{print $2}}'"')"'; '\
-'cat '$NKC' | yq  .clusters | jq -c ".[] | select(.name | contains(\\"$C\\")).cluster.server"'`"
+'A=$(cat '$NKC' | yq  .clusters -ojson | jq -c ".[] | select(.name | contains(\\"$C\\")).cluster.server"); echo "$C $A"'`"
             NKCTX="`echo "$NKCTX" | sed -e 's/^\**[[:space:]]*//' -e  's/[[:space:]].*//'`"
             [ -z $NKCTX ] && exit
             [[ "$NKCTX" == '*' ]] || kubectl config --kubeconfig=$NKC use-context $NKCTX
@@ -297,14 +297,14 @@ __cdswd(){
     do 
         echo "$a = $(cat ~/.cds/$a)"
     done|fzf +m -e \
-        --bind 'ctrl-a:become(echo {}|sed "s#^. = ##")' \
+        --bind 'ctrl-w:become(echo {}|sed "s#^. = ##")' \
         --preview='d=`echo {}|sed "s#^. = ##"`; \
             . ~/.bashrc 2>/dev/null ; \
             printf "${__GREY_ON_GREEN}`basename $d`${__RST}\n"; \
             gs=`cd $d; get_git_status clean-colors`; [ -n "$gs" ] \
                 && printf "$gs${__RST}\n"; \
             echo; ls -l --color $d'  \
-        --header $'╱ Enter (cd selection) ╱ (A)dd selection to command line \n\n'
+        --header $'╱ Enter (cd selection) ╱ (W)rite selection to command line \n\n'
 }
 cdswd-widget(){
   local selected="$(__cdswd "$@")"
@@ -321,4 +321,31 @@ cdswd-widget(){
 }
 bind -m emacs-standard -x '"\C-gf": fuck-widget'
 bind -m emacs-standard -x '"\C-gd": cdswd-widget'
+
+__ssh__(){
+    S_SSH_HOSTS=~/.ssh-hosts
+    [ -f $S_SSH_HOSTS ] || touch $S_SSH_HOSTS
+    FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info --bind='ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-y:execute-silent(echo {+}|clip.exe)'"
+    SELECTION=`cat $S_SSH_HOSTS | grep -v '^ *#' | fzf --print-query +m \
+        --bind 'ctrl-w:become(echo "#{}")' \
+        --header $'╱ Enter (ssh selection) ╱ (W)rite selection to command line \n\n'`
+    [[ "${SELECTION:0:1}" == "#" ]] && echo ${SELECTION:1}|sed "s/'//g" && return 
+    HOST=`echo $SELECTION|sed 's/.* //'`
+    [ -n "$HOST" ] || return
+    [ -z "`cat $S_SSH_HOSTS|grep $HOST`" ] && echo $HOST >> $S_SSH_HOSTS
+    [ -n "$TMUX" ]  && \
+        tmux new-window -n "ssh $HOST" ". ~/.bashrc 2>/dev/null ; enter_ssh_host $HOST" || \
+        enter_ssh_host $HOST
+}
+
+ssh-widget(){
+  local selected="$(run_ssh"$@")"
+  echo "$selected"
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+}
+bind -m emacs-standard -x '"\C-gs": ssh-widget'
+#bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
+
+source <(helm completion bash)
 
