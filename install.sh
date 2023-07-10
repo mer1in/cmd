@@ -23,7 +23,17 @@ else
     }
     npm -v || sudo apt -y install npm
     yarn -v || sudo npm install --global yarn
-    fzf --version || sudo apt -y install fzf
+    fzf --version && [[ "fzf --version|sed 's/ .*//'" == "0.38.0" ]] || {
+        sudo apt purge fzf -y
+        (
+            cd /tmp
+            PKG=fzf_0.38.0-1_amd64.deb 
+            wget http://security.ubuntu.com/ubuntu/pool/universe/f/fzf/$PKG
+            sudo dpkg -i $PKG
+            rm $PKG
+        )
+    }
+
 fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
