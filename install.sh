@@ -84,6 +84,7 @@ then
         sudo apt-get update
         sudo apt-get install -y kubectl
     }
+    batcat --version || sudo apt -y install bat
 fi
 ~/.v.utils/v --up
 
