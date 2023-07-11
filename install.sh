@@ -95,6 +95,7 @@ then
         sudo apt-get install -y kubectl
     }
     batcat --version || sudo apt -y install bat
+    jq --version || sudo apt -y install jq
 fi
 ~/.v.utils/v --up
 
