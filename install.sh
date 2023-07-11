@@ -96,6 +96,15 @@ then
     }
     batcat --version || sudo apt -y install bat
     jq --version || sudo apt -y install jq
+    yq --version || (
+        cd /tmp
+        VERSION=v4.33.3
+        BINARY=yq_linux_amd64
+        wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz
+        tar xzf ${BINARY}.tar.gz
+        sudo mv ${BINARY} /usr/bin/yq
+        sudo ln -s /usr/bin/yq /usr/local/bin/yq
+    )
 fi
 ~/.v.utils/v --up
 
