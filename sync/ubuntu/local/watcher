@@ -1,0 +1,20 @@
+#!/bin/bash
+echo "Monitor started"
+WHAT=$1
+shift 1
+
+while [[ true ]]
+do
+    chsum2=`for p in "$@" ; do \
+        find $p -type f -not -name '.*' -exec md5sum {} \; ; \
+        done | md5sum| sed 's/ .*//'`
+    if [[ $chsum1 != $chsum2 ]]
+    then
+        echo "Got changes, rebuild"
+        chsum1=$chsum2
+        (echo "$WHAT" | bash -)
+        echo $chsum1
+    fi
+    sleep 2
+    echo -n .
+done

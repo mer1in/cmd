@@ -33,7 +33,8 @@ else
             rm $PKG
         )
     }
-
+    [ -d ~/.local/bin ] || mkdir -p ~/.local/bin
+    cp sync/ubuntu/local/* ~/.local/bin/
 fi
 cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
