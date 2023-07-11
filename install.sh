@@ -23,7 +23,7 @@ else
     }
     npm -v || sudo apt -y install npm
     yarn -v || sudo npm install --global yarn
-    fzf --version && [[ "fzf --version|sed 's/ .*//'" == "0.38.0" ]] || {
+    fzf --version && [[ "`fzf --version|sed 's/ .*//'`" == "0.38.0" ]] || {
         sudo apt purge fzf -y
         (
             cd /tmp
