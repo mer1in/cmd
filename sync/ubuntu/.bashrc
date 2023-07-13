@@ -349,4 +349,4 @@ bind -m emacs-standard -x '"\C-gs": ssh-widget'
 #bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 
 source <(helm completion bash)
-
+source <(kubectl completion bash)
