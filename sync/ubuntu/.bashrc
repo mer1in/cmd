@@ -184,7 +184,8 @@ alias cd..='cd ..'
 alias cd-='cd -'
 
 export EDITOR=vim
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+[ -f ~/.vim/bundle/fzf/shell/completion.bash ] && . ~/.vim/bundle/fzf/shell/completion.bash
+[ -f ~/.vim/bundle/fzf/shell/key-bindings.bash ] && . ~/.vim/bundle/fzf/shell/key-bindings.bash
 enter_ssh_host(){
     HOST=$1
     ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $HOST 'echo' &>/dev/null
