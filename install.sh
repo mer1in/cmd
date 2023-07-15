@@ -3,6 +3,7 @@ git pull
 VIMRC=~/.vimrc
 OS=`uname -s`
 if [ $OS = Darwin ]; then
+    BATCAT=bat
     EXTENDED_REGEXP_KEY=E
     VRC_EXCLUDE='Conque-GDB ycm_server_python_interpreter'
     for dep in wget cmake; do [ -z "`which $dep`" ] && brew install $dep; done
@@ -12,6 +13,7 @@ if [ $OS = Darwin ]; then
     done
 else
     EXTENDED_REGEXP_KEY=r
+    BATCAT=batcat
     VRC_EXCLUDE=XXXXXXX
     [ -f ~/.bashrc ] && sed -i '/#_V_UTILS_BEGIN_/,/#_V_UTILS_END_/d' ~/.bashrc
     curl -V > /dev/null || sudo apt-get install -y curl
@@ -36,7 +38,9 @@ else
     [ -d ~/.local/bin ] || mkdir -p ~/.local/bin
     cp sync/ubuntu/local/* ~/.local/bin/
 fi
-cat gred.src|sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" > gred
+cat gred.src| \
+    sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" \
+    sed "s/BATCAT/$BATCAT/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
 for a in v gred svd cdr; do cp $a ~/.v.utils/; chmod +x ~/.v.utils/$a; done
 (

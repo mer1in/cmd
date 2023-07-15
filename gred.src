@@ -47,7 +47,7 @@ FZFC="fzf -m --ansi"
 export FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info \
     --preview='(f=\$(echo {}|sed 's/:.*//') && l=\$(echo {}|sed -e 's/^[^:]*://' -e 's/:.*//'); s=0; \
         (( \$l>5 )) && let s=\$l-5; let e=\$l+30; \
-        bat --style=numbers --color=always --line-range \$s:\$e \$f -H \$l)' \
+        BATCAT --style=numbers --color=always --line-range \$s:\$e \$f -H \$l)' \
     --preview-window='right' --bind='ctrl-p:toggle-preview,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-a:select-all+accept,ctrl-y:execute-silent(echo {+}|pbcopy)'"
 
 list="`grep $COLOR --exclude-dir \.svn --exclude-dir \.git $X $I -I${CI}nr "$EXPR" $P | $FZFC`"
