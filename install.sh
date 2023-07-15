@@ -39,7 +39,7 @@ else
     cp sync/ubuntu/local/* ~/.local/bin/
 fi
 cat gred.src| \
-    sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" \
+    sed "s/EXTENDED_REGEXP_KEY/$EXTENDED_REGEXP_KEY/" |\
     sed "s/BATCAT/$BATCAT/" > gred
 mkdir -p ~/.v.utils/tmp 2>/dev/null
 for a in v gred svd cdr; do cp $a ~/.v.utils/; chmod +x ~/.v.utils/$a; done
