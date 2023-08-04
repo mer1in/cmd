@@ -348,5 +348,22 @@ ssh-widget(){
 bind -m emacs-standard -x '"\C-gs": ssh-widget'
 #bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 
+tabstyle(){
+    local idx=$(tmux display-message -p '#{window_index}')
+    tmux set-window-option -t $idx window-status-style $1
+}
+taberr(){
+    tabstyle bg=red,fg=black
+}
+tabok(){
+    tabstyle bg=green,fg=black
+}
+tabrun(){
+    tabstyle bg=black,fg=white
+}
+tabdefault(){
+    tabstyle bg=default,fg=default
+}
+
 source <(helm completion bash)
 source <(kubectl completion bash)
