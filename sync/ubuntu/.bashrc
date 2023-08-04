@@ -364,6 +364,10 @@ tabrun(){
 tabdefault(){
     tabstyle bg=default,fg=default
 }
+TMUX_PREF=a
+
+[ -f ~/.bashrc.local ] && . ~/.bashrc.local
+
 
 source <(helm completion bash)
 source <(kubectl completion bash)
