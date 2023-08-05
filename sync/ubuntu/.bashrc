@@ -349,15 +349,9 @@ bind -m emacs-standard -x '"\C-gs": ssh-widget'
 #bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 
 tabstyle(){
-    script_pid=$$
-    local window_index
-    pane_list=$(tmux list-panes -aF "#{pane_pid} #{window_index}")
-    while read -r pid idx; do
-        if [ "$script_pid" == "$pid" ]; then
-            window_index="$idx"
-            break
-        fi
-    done <<< "$pane_list"
+    local pane_id=`echo "$TMUX_PANE" | sed 's/%//'`
+    window_index=`tmux list-windows | sed 's/ (active)$//' | grep "@$pane_id\$" | sed 's/^\([[:digit:]]\): .*/\1/'`
+    [ -z $window_index ] && echo "Window index not determined"
     tmux set-window-option -t $window_index window-status-style $1
 }
 taberr(){
