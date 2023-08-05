@@ -373,6 +373,12 @@ tabdefault(){
     tabstyle bg=default,fg=default
 }
 export TMUX_PREF=a
+export -f taberr
+export -f tabok
+export -f tabrun
+export -f tabdefault
+export -f tabstyle
+
 
 [ -f ~/.bashrc.local ] && . ~/.bashrc.local
 
