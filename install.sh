@@ -83,6 +83,10 @@ git config --global alias.br "branch --format='%(HEAD) %(color:yellow)%(refname:
 git config --global alias.ll '!git log --pretty=format:"%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) [%an]" --abbrev-commit'
 git config --global alias.lg '!git log --oneline --decorate --graph'
 
+git config --global diff.tool vimdiff
+git config --global merge.tool vimdiff
+git config --global difftool.prompt false
+
 if [ $OS = Linux ]
 then
     for f in .vimrc .bashrc .bashrc_prompt .tmux.conf
