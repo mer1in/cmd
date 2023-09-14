@@ -12,6 +12,7 @@ Plugin 'scrooloose/nerdtree'
 "Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
 Plugin 'neoclide/coc.nvim'
+Plugin 'sheerun/vim-polyglot'
 
 Plugin 'davidhalter/jedi-vim'
 Plugin 'supertab'
