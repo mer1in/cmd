@@ -1,22 +1,19 @@
 syntax on
 let g:solarized_termcolors=256
+let g:polyglot_disabled = ['autoindent']
 colorscheme solarized
 set nocompatible              " be iMproved, required
 filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
-"Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'scrooloose/nerdtree'
-"Plugin 'jlanzarotta/bufexplorer'
 "Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
 Plugin 'neoclide/coc.nvim'
-
+"Plugin 'sheerun/vim-polyglot'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'supertab'
-
-"Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'vim-airline/vim-airline'
@@ -26,19 +23,21 @@ Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 Plugin 'junegunn/vim-peekaboo'
 Plugin 'fatih/vim-go'
-"Plugin 'maralla/completor.vim'
 Plugin 'puremourning/vimspector'
 Plugin 'tpope/vim-surround'
 Plugin 'iamcco/markdown-preview.nvim'
-"Plugin 'pangloss/vim-javascript'
-
 call vundle#end()            " required
+
 filetype plugin indent on    " required
+" Set indentation settings for JavaScript files
+au FileType javascript,json setlocal sw=2 ts=2 et
+
 
 " coursor shape https://vim.fandom.com/wiki/Configuring_the_cursor
 let &t_SI .= "\<Esc>[4 q"
 let &t_EI .= "\<Esc>[2 q"
-
+let g:markdown_preview_bind_address = '0.0.0.0'
+let g:mkdp_port = '8484'
 
 nmap <space>wp i<C-R>=substitute(system('powershell.exe Get-Clipboard\|cat'),'[\r\n]*$','','')<CR><ESC>
 vmap <space>wy "9y:call system('clip.exe', @9)<CR>
@@ -50,6 +49,10 @@ inoremap <C-h> <Left>
 inoremap <C-j> <C-o>gj
 inoremap <C-k> <C-o>gk
 inoremap <C-l> <Right>
+inoremap <C-e> <C-o>$
+inoremap <C-s> <C-o>0
+inoremap <C-f> <C-o>w
+inoremap <C-b> <C-o>b
 nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
@@ -84,11 +87,16 @@ set ts=4
 set sw=4
 set et
 set number
-set hlsearch
 set foldmethod=syntax
 set nofoldenable
 set encoding=utf-8
 let g:ycm_server_python_interpreter='/usr/bin/python'
+set hlsearch
+
+nnoremap <Leader>w1 :match StatusLineTerm /<C-R><C-W>/<CR>
+nnoremap <Leader>w2 :2match WildMenu /<C-R><C-W>/<CR>
+nnoremap <Leader>w3 :3match Pmenu /<C-R><C-W>/<CR>
+
 
 nnoremap <silent> <Leader>= :exe "resize " . (winheight(0) * 3/2)<CR>
 nnoremap <silent> <Leader>] :exe "vertical resize " . (winwidth(0) * 3/2)<CR>
@@ -462,6 +470,36 @@ function! SourceIfExists(file)
   endif
 endfunction
 
+function! Comment(sym, mode)
+python3 << EOF
+import vim, re
+sym = vim.eval("a:sym")
+mode = vim.eval("a:mode")
+buf = vim.current.buffer
+if (mode=="visual"):
+    start = buf.mark('<')[0] - 1
+    finish =  buf.mark('>')[0]
+else:
+    (row, col) = vim.current.window.cursor
+    start = row-1
+    finish = row
+for idx in range(start, finish):
+    line = buf[idx]
+    newline = line
+    # if line starts with comment
+    if (line[0:len(sym)] == sym):
+        # remove comment
+        newline = line[len(sym):]
+    else:
+        # add comment
+        newline = sym+line
+    buf[idx] = newline
+EOF
+endfunction
+au FileType javascript,groovy nnoremap <leader>\ :call Comment("//", "normal")<CR>
+au FileType python,sh     nnoremap <leader>\ :call Comment("#",  "normal")<CR>
+au FileType javascript,groovy vnoremap <leader>\ :call Comment("//", "normal")<CR>
+au FileType python,sh     vnoremap <leader>\ :call Comment("#",  "normal")<CR>
 
 " chatgpt integration, wip
 function! ChatGPT()

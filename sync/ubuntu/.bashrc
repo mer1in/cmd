@@ -175,7 +175,8 @@ bind '"\C-gH": "\C-ex\C-u git_hist\C-m\C-y\C-b\C-d"'
 bind '"\C-gh": "\C-ex\C-u git_hist\C-m\C-y\C-b\C-d"'
 bind '"\C-gc": "\C-ex\C-u git_cbr\C-m\C-y\C-b\C-d"'
 bind '"\C-g-": "\C-ex\C-u git co -\C-m\C-y\C-b\C-d"'
-bind '"\C-gm": "\C-ex\C-u git merge --squash `git name-rev $(git rev-parse @{-1}) --name-only`\C-m\C-y\C-b\C-d"'
+bind '"\C-gq": "\C-ex\C-u git merge --squash `git name-rev $(git rev-parse @{-1}) --name-only`\C-m\C-y\C-b\C-d"'
+bind '"\C-gm": "\C-ex\C-u git merge --no-edit `git name-rev $(git rev-parse @{-1}) --name-only`\C-m\C-y\C-b\C-d"'
 #_V_UTILS_END_
 
 export FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info --preview='[[ \$(file --mime {}) =~ binary ]] && echo {} is a binary file || (PF={}; PF=\${PF/#\~/$HOME}; batcat --style=numbers --color=always \$PF) 2>/dev/null | head -300' --preview-window='right' --bind='f3:execute(PF={}; PF=\${PF/#\~/$HOME}; batcat --style=numbers \$PF),f2:toggle-preview,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-a:select-all+accept,ctrl-y:execute-silent(echo {+}|clip.exe)'"
@@ -241,7 +242,9 @@ pods() {
 }
 
 bind '"\C-np": "\C-ex\C-u pods\C-m\C-y\C-b\C-d"'
-bind '"\C-kp": "\C-ex\C-u pods\C-m\C-y\C-b\C-d"'
+bind '"\C-kn": "\C-ex\C-u pods\C-m\C-y\C-b\C-d"'
+run_k9s() { ~/src/k9s/execs/k9s; }
+bind '"\C-kp": "\C-ex\C-u run_k9s\C-m\C-y\C-b\C-d"'
 choose_kubeconfig(){
 (
     cd ~/.kube/configs/
@@ -349,25 +352,28 @@ ssh-widget(){
   READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 bind -m emacs-standard -x '"\C-gs": ssh-widget'
+bind -m emacs-standard -x '"\C-xa": tmux a||tmux'
 #bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 
 tabstyle(){
+    [ -z $TMUX_PANE ] && return
     local pane_id=`echo "$TMUX_PANE" | sed 's/%//'`
     window_index=`tmux list-windows | sed 's/ (active)$//' | grep "@$pane_id\$" | sed 's/^\([[:digit:]]\): .*/\1/'`
     [ -z $window_index ] && echo "Window index not determined"
     tmux set-window-option -t $window_index window-status-style $1
+    [ -z $2 ] || tmux rename-window -t $window_index $2
 }
 taberr(){
-    tabstyle bg=red,fg=black
+    tabstyle bg=red,fg=black $1
 }
 tabok(){
-    tabstyle bg=green,fg=black
+    tabstyle bg=green,fg=black $1
 }
 tabrun(){
-    tabstyle bg=black,fg=white
+    tabstyle bg=black,fg=white $1
 }
 tabdefault(){
-    tabstyle bg=default,fg=default
+    tabstyle bg=default,fg=default $1
 }
 export TMUX_PREF=a
 export -f taberr
@@ -378,5 +384,8 @@ export -f tabstyle
 
 source <(helm completion bash)
 source <(kubectl completion bash)
+complete -C '/usr/local/bin/aws_completer' aws
+
+export PATH=$PATH:/usr/local/go/bin
 
 [ -f ~/.bashrc.local ] && . ~/.bashrc.local
