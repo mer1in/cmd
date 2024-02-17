@@ -12,7 +12,6 @@ Plugin 'scrooloose/nerdtree'
 "Plugin 'Conque-GDB'
 Plugin 'https://github.com/regedarek/ZoomWin'
 Plugin 'neoclide/coc.nvim'
-Plugin 'sheerun/vim-polyglot'
 
 Plugin 'davidhalter/jedi-vim'
 Plugin 'supertab'
@@ -43,6 +42,7 @@ let &t_EI .= "\<Esc>[2 q"
 
 nmap <space>wp i<C-R>=substitute(system('powershell.exe Get-Clipboard\|cat'),'[\r\n]*$','','')<CR><ESC>
 vmap <space>wy "9y:call system('clip.exe', @9)<CR>
+vmap <space>y "9y:call system('clip.exe', @9)<CR>
 
 inoremap jj <Esc>
 nnoremap Q <nop>

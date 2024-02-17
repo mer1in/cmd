@@ -123,6 +123,7 @@ alias lswd='[ -d ~/.cds ] && for a in `ls ~/.cds`; do echo "$a = `cat ~/.cds/$a`
 for a in {a..z} ; do alias "sd$a=[ -d ~/.cds ] || mkdir ~/.cds ; pwd > ~/.cds/$a; echo \"$a: \`cat ~/.cds/$a;\`\"" ; done
 for a in {a..z} ; do alias "cd$a=[[ -d ~/.cds && -f ~/.cds/$a ]] && cd \`cat ~/.cds/$a\` && pwd || echo '$a doesnt exist'" ; done
 alias cdr='cd $(~/.v.utils/cdr)'
+alias cdt='_TMP=/tmp/`genpass`; mkdir $_TMP; cd $_TMP'
 alias cdswd='[ -d ~/.cds ] && d="`for a in $(ls ~/.cds/|grep -v config); do echo \"$a = $(cat ~/.cds/$a)\"; done|fzf +m -e`" && { [ -z "$d" ] || cd $(echo $d|sed "s/^. = //") ; }'
 alias sdr='echo "r is reserved for git root"'
 #bind '"\C-gd": "\C-ex\C-u cdswd\C-m\C-y\C-b\C-d"'
@@ -205,7 +206,8 @@ run_ssh(){
     FZF_DEFAULT_OPTS="--no-mouse --height 50% -1 --reverse --multi --inline-info --bind='ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-y:execute-silent(echo {+}|clip.exe)'"
     SELECTION=`cat $S_SSH_HOSTS | grep -v '^ *#' | fzf --print-query +m \
         --bind 'ctrl-w:become(echo "#{}")' \
-        --header $'╱ Enter (ssh selection) ╱ (W)rite selection to command line \n\n'`
+        --bind 'ctrl-h:become(echo {}|sed "s_.*@_#_")' \
+        --header $'╱ Enter (ssh selection) ╱ (W)rite selection to command line / (H)ostname to command line \n\n'`
     [[ "${SELECTION:0:1}" == "#" ]] && echo ${SELECTION:1}|sed "s/'//g" && return 
     HOST=`echo $SELECTION|sed 's/.* //'`
     [ -n "$HOST" ] || return
@@ -374,10 +376,7 @@ export -f tabrun
 export -f tabdefault
 export -f tabstyle
 
-
-[ -f ~/.bashrc.local ] && . ~/.bashrc.local
-
-
-
 source <(helm completion bash)
 source <(kubectl completion bash)
+
+[ -f ~/.bashrc.local ] && . ~/.bashrc.local
