@@ -132,14 +132,19 @@ alias sdr='echo "r is reserved for git root"'
 CF=~/.cds/config.json; [ -f $CF ] && export WINDOWS_PREFIXES=`cat $CF |jq -r '.[] | .prefix'`
 
 alias gut=git
-bind '"\C-gp": "\C-ex\C-u git push || git pull -r && git push\C-m\C-y\C-b\C-d"'
+bind '"\C-gp": "\C-ex\C-u git push || \
+    git pull -r && git push || \
+    ! git rev-parse --abbrev-ref --symbolic-full-name @{u} && \
+    git push --set-upstream origin `git branch --show-current`\C-m\C-y\C-b\C-d"'
 bind '"\C-gg": "\C-ex\C-u git remote update origin --prune ; git pull -r\C-m\C-y\C-b\C-d"'
 function git_hist_file(){
     rev=$1
     PROMPT=$(git ll -1 --color=always $rev)
     while [ 1 ]
     do
-        search=`git log --name-only --oneline -1 $rev | sed -n '2,$p'|fzf +m +1 --prompt="$PROMPT > " -q "$q" --preview="git log --oneline -p -1 $rev -- {} | ydiff -s -w0 -c always" --preview-window=down,70% --height=100% --print-query`
+        search=`git log --name-only --oneline -1 $rev | \
+            sed -n '2,$p'| \
+            fzf +m +1 --prompt="$PROMPT > " -q "$q" --preview="git log --oneline -p -1 $rev -- {} | ydiff -s -w0 -c always" --preview-window=down,70% --height=100% --print-query`
         q="`echo "$search" | sed -n '1p'`"
         f="`echo "$search" | sed -n '2p'`"
         [ -z $f ] && return
@@ -154,25 +159,45 @@ function git_hist(){
     cdr
     while [ 1 ]
     do
-        search=$(git ll --color=always -- $OBJ | fzf -q "$query" --print-query +m --ansi --prompt="$OBJ @ $BRANCH > "\
-            --preview 'R=`echo {}|sed s"/ .*//"` ; git log -1 --name-status $R|batcat --color=always --style=plain ; echo ; git diff -U0  $R^..$R | batcat --color=always --style=numbers' --height=100)
+        search=$(git ll --color=always -- $OBJ | \
+            fzf -q "$query" --print-query +m --ansi --prompt="$OBJ @ $BRANCH > " \
+            --header $'╱ (Enter) commit ╱ (W)rite hash ╱ chec(K)out ╱ (S)oft reset ╱ (M)ixed reset \n\n' \
+            --bind 'ctrl-w:become(echo HASH:{}|sed "s#^. = ##")' \
+            --bind 'ctrl-k:execute:git co {1} ' \
+            --bind 'ctrl-s:execute:git reset --soft {1} ' \
+            --bind 'ctrl-m:execute:git reset --mixed {1} ' \
+            --preview 'R=`echo {}|sed s"/ .*//"` ;\
+                    git log -1 --name-status $R|batcat --color=always --style=plain ; \
+                    echo ; git diff -U0  $R^..$R | batcat --color=always --style=numbers' --height=100)
         rev=$(echo "$search"|sed -n 2p|sed 's/ .*//')
         query=`echo "$search" | sed -n '1p'`
+        [ -n "`echo $search|grep HASH`" ] && echo $search| \
+            sed -e 's/HASH://' -e 's/ .*//' && return
         [ -z $rev ] && return
         git_hist_file $rev
     done
     )
 }
-function git_lhist(){
-    git_hist .
+
+git-history-widget-root(){
+  local selected="$(git_hist `cdr;pwd`)"
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
+
+git-history-widget(){
+  local selected="$(git_hist)"
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+}
+
 function git_cbr(){
     git branch -a --sort=-committerdate | sed -e 's/remotes\/origin\///' -e 's/^..//' | \
         grep -v HEAD | uniq | \
         fzf --header "Checkout Branch in `git remote get-url origin`" --preview "git show-branch {1} &>/dev/null && git ll {1} --color=always || git ll remotes/origin/{1} --color=always" | xargs git co
 }
-bind '"\C-gH": "\C-ex\C-u git_hist\C-m\C-y\C-b\C-d"'
-bind '"\C-gh": "\C-ex\C-u git_hist\C-m\C-y\C-b\C-d"'
+bind -m emacs-standard -x '"\C-gh": git-history-widget'
+bind -m emacs-standard -x '"\C-gH": git-history-widget-root'
 bind '"\C-gc": "\C-ex\C-u git_cbr\C-m\C-y\C-b\C-d"'
 bind '"\C-g-": "\C-ex\C-u git co -\C-m\C-y\C-b\C-d"'
 bind '"\C-gq": "\C-ex\C-u git merge --squash `git name-rev $(git rev-parse @{-1}) --name-only`\C-m\C-y\C-b\C-d"'
@@ -243,7 +268,7 @@ pods() {
 
 bind '"\C-np": "\C-ex\C-u pods\C-m\C-y\C-b\C-d"'
 bind '"\C-kn": "\C-ex\C-u pods\C-m\C-y\C-b\C-d"'
-run_k9s() { ~/src/k9s/execs/k9s; }
+run_k9s() { /home/roman/src/k9s/execs/k9s; }
 bind '"\C-kp": "\C-ex\C-u run_k9s\C-m\C-y\C-b\C-d"'
 choose_kubeconfig(){
 (
@@ -352,7 +377,8 @@ ssh-widget(){
   READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 bind -m emacs-standard -x '"\C-gs": ssh-widget'
-bind -m emacs-standard -x '"\C-xa": tmux a||tmux'
+bind -m emacs-standard -x '"\C-xa": tmux a || tmux'
+bind -m emacs-standard -x '"\C-xr": . ~/.bashrc'
 #bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 
 tabstyle(){
