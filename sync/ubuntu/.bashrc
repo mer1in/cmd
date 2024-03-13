@@ -136,7 +136,8 @@ bind '"\C-gp": "\C-ex\C-u git push || \
     git pull -r && git push || \
     ! git rev-parse --abbrev-ref --symbolic-full-name @{u} && \
     git push --set-upstream origin `git branch --show-current`\C-m\C-y\C-b\C-d"'
-bind '"\C-gg": "\C-ex\C-u git remote update origin --prune ; git pull -r\C-m\C-y\C-b\C-d"'
+#bind '"\C-gp": "\C-ex\C-u git push || git pull -r && git push\C-m\C-y\C-b\C-d"'
+bind '"\C-gg": "\C-ex\C-u git remote update origin --prune ; git pull -r ;  git submodule update --init \C-m\C-y\C-b\C-d"'
 function git_hist_file(){
     rev=$1
     PROMPT=$(git ll -1 --color=always $rev)
@@ -144,11 +145,11 @@ function git_hist_file(){
     do
         search=`git log --name-only --oneline -1 $rev | \
             sed -n '2,$p'| \
-            fzf +m +1 --prompt="$PROMPT > " -q "$q" --preview="git log --oneline -p -1 $rev -- {} | ydiff -s -w0 -c always" --preview-window=down,70% --height=100% --print-query`
-        q="`echo "$search" | sed -n '1p'`"
-        f="`echo "$search" | sed -n '2p'`"
-        [ -z $f ] && return
-        git difftool $rev^..$rev -- $f
+            fzf +m +1 --prompt="$PROMPT > " -q "$q" \
+                --preview="git log --oneline -p -1 $rev -- {} | ydiff -s -w0 -c always" \
+                --preview-window=down,70% --height=100% --print-query \
+                --bind "ctrl-w:become(git difftool $rev^..$rev -- {} < /dev/tty > /dev/tty)"`
+        [ -z "$search" ] || return
     done
 }
 function git_hist(){
@@ -161,11 +162,11 @@ function git_hist(){
     do
         search=$(git ll --color=always -- $OBJ | \
             fzf -q "$query" --print-query +m --ansi --prompt="$OBJ @ $BRANCH > " \
-            --header $'╱ (Enter) commit ╱ (W)rite hash ╱ chec(K)out ╱ (S)oft reset ╱ (M)ixed reset \n\n' \
+            --header $'╱ (Enter) commit ╱ (W)rite hash ╱ chec(K)out ╱ (S)oft reset ╱ mi(X)ed reset \n\n' \
             --bind 'ctrl-w:become(echo HASH:{}|sed "s#^. = ##")' \
             --bind 'ctrl-k:execute:git co {1} ' \
             --bind 'ctrl-s:execute:git reset --soft {1} ' \
-            --bind 'ctrl-m:execute:git reset --mixed {1} ' \
+            --bind 'ctrl-x:execute:git reset --mixed {1} ' \
             --preview 'R=`echo {}|sed s"/ .*//"` ;\
                     git log -1 --name-status $R|batcat --color=always --style=plain ; \
                     echo ; git diff -U0  $R^..$R | batcat --color=always --style=numbers' --height=100)
@@ -378,16 +379,15 @@ ssh-widget(){
 }
 bind -m emacs-standard -x '"\C-gs": ssh-widget'
 bind -m emacs-standard -x '"\C-xa": tmux a || tmux'
-bind -m emacs-standard -x '"\C-xr": . ~/.bashrc'
+bind -m emacs-standard -x '"\C-xr": . ~/.bashrc && echo "bashrc reloaded"'
 #bind '"\C-gs": "\C-ex\C-u run_ssh\C-m\C-y\C-b\C-d"'
 
 tabstyle(){
     [ -z $TMUX_PANE ] && return
-    local pane_id=`echo "$TMUX_PANE" | sed 's/%//'`
-    window_index=`tmux list-windows | sed 's/ (active)$//' | grep "@$pane_id\$" | sed 's/^\([[:digit:]]\): .*/\1/'`
-    [ -z $window_index ] && echo "Window index not determined"
-    tmux set-window-option -t $window_index window-status-style $1
-    [ -z $2 ] || tmux rename-window -t $window_index $2
+#    window_index=`tmux list-panes -a -F '#{pane_id}#{window_id}' | grep "$TMUX_PANE" | sed -e "s/$TMUX_PANE//" -e 's/@//'`
+#    [ -z $window_index ] && echo "Window index not determined"
+    tmux set-window-option -t $TMUX_PANE window-status-style $1
+    [ -z $2 ] || tmux rename-window -t $TMUX_PANE $2
 }
 taberr(){
     tabstyle bg=red,fg=black $1
